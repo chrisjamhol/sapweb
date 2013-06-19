@@ -1,0 +1,3 @@
+[submodule "public/libary/craftyjs"]
+	path = public/libary/craftyjs
+	url = git@github.com:craftyjs/craftyjs.github.com.git
