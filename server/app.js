@@ -9,6 +9,7 @@ var __publicPaths = {
     publicSocketPath : path.join(__dirname, '../' , 'public/scripts/websockets/'),
     publicImagePath : path.join(__dirname, '../' , 'public/images/'),
     publicLibaryPath: path.join(__dirname, '../' , 'public/libary/'),
+    publicGamefilesPath: path.join(__dirname, '../' , 'public/gamefiles/'),
     publicComponentsPath: path.join(__dirname, '../' , 'public/scripts/gamefiles/components/')
 }
 
@@ -44,5 +45,8 @@ app.get('/public/images/:imageName',function(req,res){res.sendfile(__publicPaths
 app.get('/public/libary/*',function(req,res){res.sendfile(__publicPaths.publicLibaryPath+req.params[0]);});
 
 //piping gamefiles
-app.get('/public/scripts/gamefiles/sap.js',function(req,res){res.sendfile(__publicPaths.publicScriptPath+"gamefiles/sap.js");});
 app.get('/public/components/*',function(req,res){res.sendfile(__publicPaths.publicComponentsPath+req.params[0]);});
+app.get('/public/gamefiles/*',function(req,res){
+    //console.log(req.params[0]);
+    res.sendfile(__publicPaths.publicGamefilesPath+req.params[0]);
+});

@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<script src="/public/libary/jquery/jquery-2.0.3.js"></script>
 	<script src="/public/libary/craftyjs/release/0.5.4/crafty.js"></script>
-	<script src="/public/scripts/gamefiles/sap.js"></script>
+	<script src="/public/scripts/game.js"></script>
+	<script>
+		$('document').ready(Game.start());
+	</script>
 </head>
 <body>
 	<%- include partials/header %>
