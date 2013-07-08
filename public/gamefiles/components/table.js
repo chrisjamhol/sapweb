@@ -1,5 +1,5 @@
 Crafty.c('table',{
-	handcardsCount: 4,	
+	handcardsCount: 4,
 	cards: null,
 	fieldCardslots: null,
 	player: [],
@@ -8,7 +8,7 @@ Crafty.c('table',{
 	playerCardslotsPos: {
 					top:[[560,25],[660,25],[760,25],[860,25]],
 					bottom:[[560,440],[660,440],[760,440],[860,440]]
-				  },	
+				  },
 	table: function(cards,playercount){
 		this.cards = cards;
 		this.playercount = playercount;
@@ -16,9 +16,9 @@ Crafty.c('table',{
 		for(var i=0;i<=this.playercount-1;i++)
 		{
 			this.player.push(
-				Crafty.e("2D, DOM, player,life")								
+				Crafty.e("2D, DOM, player,life")
 			);
-		}	
+		}
 		return this;
 	},
 	init: function(playercount){
@@ -29,7 +29,7 @@ Crafty.c('table',{
 			getSlots: function(){return this.rows;},
 			rows: [
 						//row1
-					[						
+					[
 						{x:offset.x+cardsAttr.padding,y:offset.y+cardsAttr.padding,card:null},
 						{x:offset.x+cardsAttr.padding*2+cardsAttr.w*1,y:offset.y+cardsAttr.padding,card:null},
 						{x:offset.x+cardsAttr.padding*3+cardsAttr.w*2,y:offset.y+cardsAttr.padding,card:null},
@@ -71,52 +71,46 @@ Crafty.c('table',{
 				  ]
 		};
 	}
-	,giveCards: function(){		
+	,giveCards: function(){
 		$.each(this.playerCardslotsPos,function(direction,position){
 			for(var i=0;i<=position.length-1;i++){
-				Crafty.e("2D,DOM,cardslot").attr({x:position[i][0], y:position[i][1]});
+				Crafty.e("2D,DOM,Cardslot").attr({x:position[i][0], y:position[i][1]});
 			}
 		});
 		var givenCards = [];
 			//playing cards
 		var fieldSlots = this.fieldCardslots.getSlots();
-		var cards = this.cards;				
-		$.each(fieldSlots,function(key,row){			
+		var cards = this.cards;
+		$.each(fieldSlots,function(key,row){
 			if(key == 1 || key == 2 || key ==3)
 			{
-				Crafty.e("2D,DOM,cardslot").attr({x:row[0].x, y:row[0].y});	//free left and right cardslot
-				Crafty.e("2D,DOM,cardslot").attr({x:row[4].x, y:row[4].y});
+				Crafty.e("2D,DOM,Cardslot").attr({x:row[0].x, y:row[0].y});	//free left and right cardslot
+				Crafty.e("2D,DOM,Cardslot").attr({x:row[4].x, y:row[4].y});
 				for(var col=1;col<=3;col++)
-				{		
+				{
 					var randnumber = Math.floor((Math.random()*cards.length));
 					var card = Crafty.e("2D, DOM, Card, "+cards[randnumber])
 								.attr({
 									x: row[col].x+5,
 									y: row[col].y+5,
 									value: cards[randnumber]
-								})								
+								})
 					row[col].card = card;
 					givenCards.push(cards[randnumber]);
 					cards.splice(randnumber,1);
-				}			
+				}
 			}
 			else
 			{
 				for(var col=0;col<=row.length-1;col++)
-				{					
-					Crafty.e("2D,DOM,cardslot,Collision")
+				{
+					Crafty.e("2D,DOM,Cardslot")
 						.attr({
-							x:row[col].x, 
+							x:row[col].x,
 							y:row[col].y
-						})
-						.onHit('Card',function(data){
-							console.log("hit");
-							this.unbind('EnterFrame');
-							console.log(this);
-							console.log(data[0].obj);
 						});
 				}
-			}				
+			}
 		});
 		return givenCards;
 		//to show all cards
@@ -124,21 +118,17 @@ Crafty.c('table',{
 		// for(var i=0;i<=stacklength-1;i++){
 		// 	var randnumber = Math.floor((Math.random()*this.stackcards.length));
 		// 	if((i%15)==0){x=0;y++;}
-		// 	randomcards.push(Crafty.e("2D, DOM, Card, Draggable, "+this.stackcards[randnumber]).attr({x: (x*width),y: (y*height)}));			
+		// 	randomcards.push(Crafty.e("2D, DOM, Card, Draggable, "+this.stackcards[randnumber]).attr({x: (x*width),y: (y*height)}));
 		// 	x++;
 		// 	this.stackcards.splice(randnumber,1);
 		// }
 	}
-	,cardDropped: function(pos){
-		console.log(pos);
+	,setCard: function(card,cardslot){
+
 	}
-	,setCard: function(){
-		console.log("hit");
-		//console.log(data);
-	}
-	,newGame: function(){		
+	,newGame: function(){
 		var givenCards = this.giveCards();
-		var that = this;		
+		var that = this;
 		$.each(this.player,function(key,player){
 			var playerHp = 100;
 			player
@@ -152,7 +142,7 @@ Crafty.c('table',{
 		});
 	}
 	,getRandomCard: function(){
-		return 
+		return
 	}
 	,shuffle: function(array){
 		var currentIndex = array.length
@@ -169,6 +159,6 @@ Crafty.c('table',{
 			array[randomIndex] = temporaryValue;
 		}
 		return array;
-	}	
-	,getPlayerCardslots: function(direction){return this.playerCardslotsPos[direction];}	
+	}
+	,getPlayerCardslots: function(direction){return this.playerCardslotsPos[direction];}
 });

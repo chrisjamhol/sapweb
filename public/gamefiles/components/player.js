@@ -17,7 +17,7 @@ Crafty.c('player',{
 		this.cardslots = cardslots;
 		return this;
 	}
-	,init: function(){	
+	,init: function(){
 
 	}
 	,drawCards: function(count){
@@ -25,20 +25,20 @@ Crafty.c('player',{
 		console.log(this.cardslots);
 		for(var i=0;i<=count-1;i++)
 		{
-			var randnumber = Math.floor((Math.random()*this.stackcards.length));			
+			var randnumber = Math.floor((Math.random()*this.stackcards.length));
 			randomcards.push(
 				Crafty.e("2D, DOM, Card, Draggable,"+this.stackcards[randnumber])
+					.Card(this.table)
 					.attr({
 						x: this.cardslots[i][0]+5,
 						y: this.cardslots[i][1]+5,
 						value: this.stackcards[randnumber]
 					})
-					// .bind("StopDrag", function() {
-					// 	console.log(this.attr('x')+" "+this.attr('y')+" "+this.value);
-					// 	this.tabel.setCard(this);
-					// 	//if(blabla) 
-					// })
-			);			
+					.bind("StopDrag", function() {
+						var chosencardslot = this.dropped();
+						//this.table.showdown(chosencardslot);
+					})
+			);
 			this.stackcards.splice(randnumber,1);
 		}
 	}
@@ -47,5 +47,5 @@ Crafty.c('player',{
 	}
 	,getHp: function(){
 		console.log(this.hp);
-	}			
+	}
 });

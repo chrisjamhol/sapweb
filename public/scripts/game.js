@@ -3,11 +3,11 @@ Game = {
 	{
 		var spritepath = "/public/gamefiles/sprites/";
 		var gamefilespath = "/public/gamefiles/";
-		loadComponents(['card','player','table'],function(){			
+		loadComponents(['card','player','table','rules'],function(){
 			var cards = [];
 			Crafty.init(1000, 563);
 			Crafty.DrawManager.draw(10,10,300,300)
-			//Crafty.canvas();	
+			//Crafty.canvas();
 				// c clubs
 				// d dimonds
 				// h heats
@@ -16,9 +16,9 @@ Game = {
 				// j jack
 				// q qeen
 				// k king
-				// a ass	
-			
-			//load cards			
+				// a ass
+
+			//load cards
 			var cardsrows = 14+1;// -> offset because start is 2
 			var cardspos = {};
 			for(var i=2; i<=cardsrows;i++){
@@ -26,7 +26,7 @@ Game = {
 				var pos2 = [1,i-2];
 				var pos3 = [2,i-2];
 				var pos4 = [3,i-2];
-				
+
 				if(i == 2)			//2's cards
 				{cardspos["c"+2] = [0,0];cardspos["d"+2] = [1,0];cardspos["h"+2] = [2,0];cardspos["s"+2] = [3,0];}
 				else if(i <= 10)	//numberd cards
@@ -43,46 +43,46 @@ Game = {
 				{
 					var jokerCount = 2;
 					for(var j=1; j<=jokerCount;j++)
-					{cardspos["j"+j] = pos1;}			
+					{cardspos["j"+j] = pos1;}
 				}
-			}	
+			}
 			Crafty.sprite(60,72,spritepath+"cards/cards.png",cardspos,0);
 			//save all avalible cards in cards[]
 			$.each(cardspos,function(key,pos){cards.push(key);});
 			//end load cards
 
 			//other sprites
-			Crafty.sprite(70,83,gamefilespath+'images/cardslot.png',{'cardslot':[0,0]},0);
-			
+			Crafty.sprite(70,83,gamefilespath+'images/cardslot.png',{'Cardslot':[0,0]},0);
+
 			//the loading screen that will display while our assets load
-			Crafty.scene("loading", function() {				
+			Crafty.scene("loading", function() {
 				Crafty.background("#FFF");
 				var itemsToLoad = [
 									spritepath+"cards/cards.png"
 								  ];
 				Crafty.load(itemsToLoad, function() {
 					Crafty.scene("main"); //after loading the icons, load main
-				});				
-			});			
-			Crafty.scene("loading");	
+				});
+			});
+			Crafty.scene("loading");
 
 			Crafty.scene("main", function() {
 				Crafty.background("url('"+gamefilespath+"background/background1.png')");
-				var playercount = 2;	
+				var playercount = 2;
 				var table = Crafty.e("2D,DOM,table").table(cards,playercount);
-				table.newGame();							
+				table.newGame();
 			});
-		});	
+		});
 
 		function loadComponents(components,callback){
 			var loaded = 0;	var compLenght = components.length;
 			for(var i=0; i<=compLenght-1;i++)
-			{				
+			{
 				$.getScript(gamefilespath+'components/'+components[i]+'.js',function(){
 					//continue if all components are loaded
 					if(loaded == compLenght-1){callback();}else{loaded++;}
-				});	
+				});
 			}
-		}	
-	}	
+		}
+	}
 }
