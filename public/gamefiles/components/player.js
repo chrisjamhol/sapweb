@@ -1,14 +1,17 @@
 Crafty.c('player',{
+	id: null,
 	table: null,
-	turn: false,
 	hp: null,
 	cards: null,
 	stackcards: null,
 	acitvecards: null,
 	direction: null,
-	cardslots: [],
+	cardslots: null,
 
-	player: function(hp,cards,table,direction,cardslots){
+	player: function(id,hp,cards,table,direction,cardslots){
+		this.cardslots = [];		
+		this.acitvecards = [];
+		this.id = id;
 		this.hp = hp;
 		this.direction = direction;
 		this.table = table;
@@ -21,12 +24,10 @@ Crafty.c('player',{
 
 	}
 	,drawCards: function(count){
-		var randomcards = [];
-		console.log(this.cardslots);
 		for(var i=0;i<=count-1;i++)
 		{
 			var randnumber = Math.floor((Math.random()*this.stackcards.length));
-			randomcards.push(
+			this.acitvecards.push(
 				Crafty.e("2D, DOM, Card, Draggable,"+this.stackcards[randnumber])
 					.Card(this.table)
 					.attr({
@@ -34,7 +35,12 @@ Crafty.c('player',{
 						y: this.cardslots[i][1]+5,
 						value: this.stackcards[randnumber]
 					})
-					.bind("StopDrag", function() {
+					.bind("StartDrag",function(){
+						this.oldpos.x = this.x;
+						this.oldpos.y = this.y;
+					})
+					.bind("StopDrag", function(data) {
+						//console.log(data);
 						var chosencardslot = this.dropped();
 						//this.table.showdown(chosencardslot);
 					})
@@ -43,7 +49,14 @@ Crafty.c('player',{
 		}
 	}
 	,isTurn: function(){
-		console.log(this.turn);
+		$.each(this.acitvecards,function(key,card){
+			card.enableDrag();
+		});
+	}
+	,turnOver: function(){
+		$.each(this.acitvecards,function(key,card){
+			card.disableDrag();
+		});
 	}
 	,getHp: function(){
 		console.log(this.hp);

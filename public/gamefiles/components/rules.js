@@ -1,7 +1,21 @@
 Crafty.c('Rules',{
+	hands: null,
+	init: function(){
+		this.hands = {
+			straightflush: this.straightflush,
+			fourofakind: this.fourofakind,
+			fullhouse: this.fullhouse,
+			flush: this.flush,
+			staight: this.staight,
+			threeofakind: this.threeofakind,
+			twopair: this.twopair,
+			onepair: this.onepair
+			//,highcard: {}
+		}
+	},
 	straightflush: function(){
 
-		return false;
+	return false;
 	},
 	fourofakind: function(){
 
@@ -30,6 +44,5 @@ Crafty.c('Rules',{
 	onepair: function(){
 
 		return false;
-	}
-	//,highcard: {}
+	}	
 });

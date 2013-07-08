@@ -5,6 +5,11 @@ Crafty.c('table',{
 	player: [],
 	playercount: null,
 	directions: ['top','bottom'],
+	rules: null,
+	turn: {
+		player: null,
+		move: 0
+	},
 	playerCardslotsPos: {
 					top:[[560,25],[660,25],[760,25],[860,25]],
 					bottom:[[560,440],[660,440],[760,440],[860,440]]
@@ -19,6 +24,7 @@ Crafty.c('table',{
 				Crafty.e("2D, DOM, player,life")
 			);
 		}
+		this.rules = Crafty.e("Rules");
 		return this;
 	},
 	init: function(playercount){
@@ -84,8 +90,8 @@ Crafty.c('table',{
 		$.each(fieldSlots,function(key,row){
 			if(key == 1 || key == 2 || key ==3)
 			{
-				Crafty.e("2D,DOM,Cardslot").attr({x:row[0].x, y:row[0].y});	//free left and right cardslot
-				Crafty.e("2D,DOM,Cardslot").attr({x:row[4].x, y:row[4].y});
+				Crafty.e("2D,DOM,Cardslot,FieldCardslot").attr({x:row[0].x, y:row[0].y});	//free left and right cardslot
+				Crafty.e("2D,DOM,Cardslot,FieldCardslot").attr({x:row[4].x, y:row[4].y});
 				for(var col=1;col<=3;col++)
 				{
 					var randnumber = Math.floor((Math.random()*cards.length));
@@ -104,7 +110,7 @@ Crafty.c('table',{
 			{
 				for(var col=0;col<=row.length-1;col++)
 				{
-					Crafty.e("2D,DOM,Cardslot")
+					Crafty.e("2D,DOM,Cardslot,FieldCardslot")
 						.attr({
 							x:row[col].x,
 							y:row[col].y
@@ -123,8 +129,17 @@ Crafty.c('table',{
 		// 	this.stackcards.splice(randnumber,1);
 		// }
 	}
-	,setCard: function(card,cardslot){
-
+	,cardDropped: function(card,cardslot){
+		console.log(this.turn);
+		if(this.turn.move < 1)
+		{this.turn.move++;}
+		else
+		{
+			this.player[this.turn.player].turnOver();
+			this.turn.player = (this.turn.player == this.player[0].id) ? this.player[1].id : this.player[0].id;
+			this.player[this.turn.player].isTurn();
+			this.turn.move = 0;			
+		}		
 	}
 	,newGame: function(){
 		var givenCards = this.giveCards();
@@ -133,6 +148,7 @@ Crafty.c('table',{
 			var playerHp = 100;
 			player
 				.player(
+					key,
 					playerHp,
 					that.shuffle(that.cards),
 					that,that.directions[key],
@@ -140,6 +156,11 @@ Crafty.c('table',{
 				)
 				.drawCards(4);
 		});
+		if(this.turn.player == null)
+		{
+			this.turn.player = this.player[0].id;	//randomize!!!!			
+			this.player[this.turn.player].isTurn();
+		}
 	}
 	,getRandomCard: function(){
 		return
