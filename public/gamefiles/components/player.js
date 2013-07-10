@@ -9,7 +9,7 @@ Crafty.c('player',{
 	cardslots: null,
 
 	player: function(id,hp,cards,table,direction,cardslots){
-		this.cardslots = [];		
+		this.cardslots = [];
 		this.acitvecards = [];
 		this.id = id;
 		this.hp = hp;
@@ -19,9 +19,6 @@ Crafty.c('player',{
 		this.stackcards = cards;
 		this.cardslots = cardslots;
 		return this;
-	}
-	,init: function(){
-
 	}
 	,drawCards: function(count){
 		for(var i=0;i<=count-1;i++)

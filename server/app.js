@@ -41,12 +41,12 @@ app.get('/',function(req,res){
 app.get('/public/scripts/:scriptName',function(req,res){res.sendfile(__publicPaths.publicScriptPath+req.params['scriptName']);});
 app.get('/public/styles/:styleName',function(req,res){res.sendfile(__publicPaths.publicStylePath+req.params['styleName']);});
 app.get('/public/sockets/:socketName',function(req,res){res.sendfile(__publicPaths.publicSocketPath+req.params['socketName']);});
-app.get('/public/images/:imageName',function(req,res){res.sendfile(__publicPaths.publicImagePath+req.params['imageName']);});
+app.get('/public/images/:imageName',function(req,res){console.log(req.params['imageName']);res.sendfile(__publicPaths.publicImagePath+req.params['imageName']);});
 app.get('/public/libary/*',function(req,res){res.sendfile(__publicPaths.publicLibaryPath+req.params[0]);});
 
 //piping gamefiles
 app.get('/public/components/*',function(req,res){res.sendfile(__publicPaths.publicComponentsPath+req.params[0]);});
 app.get('/public/gamefiles/*',function(req,res){
-    //console.log(req.params[0]);
+    console.log(req.params[0]);
     res.sendfile(__publicPaths.publicGamefilesPath+req.params[0]);
 });

@@ -29,58 +29,31 @@ Crafty.c('table',{
 	},
 	init: function(playercount){
 			//init battelfield
-		var offset = {x: 86, y: 70};
-		var cardsAttr = {w: 70, h: 82, padding: 5};
 		this.fieldCardslots = {
 			getSlots: function(){return this.rows;},
-			rows: [
-						//row1
-					[
-						{x:offset.x+cardsAttr.padding,y:offset.y+cardsAttr.padding,card:null},
-						{x:offset.x+cardsAttr.padding*2+cardsAttr.w*1,y:offset.y+cardsAttr.padding,card:null},
-						{x:offset.x+cardsAttr.padding*3+cardsAttr.w*2,y:offset.y+cardsAttr.padding,card:null},
-						{x:offset.x+cardsAttr.padding*4+cardsAttr.w*3,y:offset.y+cardsAttr.padding,card:null},
-						{x:offset.x+cardsAttr.padding*5+cardsAttr.w*4,y:offset.y+cardsAttr.padding,card:null}
-					],
-						//row2
-					[
-						{x:offset.x+cardsAttr.padding,y:offset.y+cardsAttr.padding*2+cardsAttr.h,card:null},
-						{x:offset.x+cardsAttr.padding*2+cardsAttr.w*1,y:offset.y+cardsAttr.padding*2+cardsAttr.h,card:null},
-						{x:offset.x+cardsAttr.padding*3+cardsAttr.w*2,y:offset.y+cardsAttr.padding*2+cardsAttr.h,card:null},
-						{x:offset.x+cardsAttr.padding*4+cardsAttr.w*3,y:offset.y+cardsAttr.padding*2+cardsAttr.h,card:null},
-						{x:offset.x+cardsAttr.padding*5+cardsAttr.w*4,y:offset.y+cardsAttr.padding*2+cardsAttr.h,card:null}
-					],
-						//row3
-					[
-						{x:offset.x+cardsAttr.padding,y:offset.y+cardsAttr.padding*3+cardsAttr.h*2,card:null},
-						{x:offset.x+cardsAttr.padding*2+cardsAttr.w*1,y:offset.y+cardsAttr.padding*3+cardsAttr.h*2,card:null},
-						{x:offset.x+cardsAttr.padding*3+cardsAttr.w*2,y:offset.y+cardsAttr.padding*3+cardsAttr.h*2,card:null},
-						{x:offset.x+cardsAttr.padding*4+cardsAttr.w*3,y:offset.y+cardsAttr.padding*3+cardsAttr.h*2,card:null},
-						{x:offset.x+cardsAttr.padding*5+cardsAttr.w*4,y:offset.y+cardsAttr.padding*3+cardsAttr.h*2,card:null}
-					],
-						//row4
-					[
-						{x:offset.x+cardsAttr.padding,y:offset.y+cardsAttr.padding*4+cardsAttr.h*3,card:null},
-						{x:offset.x+cardsAttr.padding*2+cardsAttr.w*1,y:offset.y+cardsAttr.padding*4+cardsAttr.h*3,card:null},
-						{x:offset.x+cardsAttr.padding*3+cardsAttr.w*2,y:offset.y+cardsAttr.padding*3+cardsAttr.h*3,card:null},
-						{x:offset.x+cardsAttr.padding*4+cardsAttr.w*3,y:offset.y+cardsAttr.padding*4+cardsAttr.h*3,card:null},
-						{x:offset.x+cardsAttr.padding*5+cardsAttr.w*4,y:offset.y+cardsAttr.padding*4+cardsAttr.h*3,card:null}
-					],
-						//row5
-					[
-						{x:offset.x+cardsAttr.padding,y:offset.y+cardsAttr.padding*5+cardsAttr.h*4,card:null},
-						{x:offset.x+cardsAttr.padding*2+cardsAttr.w*1,y:offset.y+cardsAttr.padding*5+cardsAttr.h*4,card:null},
-						{x:offset.x+cardsAttr.padding*3+cardsAttr.w*2,y:offset.y+cardsAttr.padding*5+cardsAttr.h*4,card:null},
-						{x:offset.x+cardsAttr.padding*4+cardsAttr.w*3,y:offset.y+cardsAttr.padding*5+cardsAttr.h*4,card:null},
-						{x:offset.x+cardsAttr.padding*5+cardsAttr.w*4,y:offset.y+cardsAttr.padding*5+cardsAttr.h*4,card:null}
-					]
-				  ]
+			rows: []
 		};
+				//seting up the positions for the fieldcardslots
+			var offset = {x: 86, y: 70},
+				cardsAttr = {w: 70, h: 82, padding: 5},
+				rowcount = 5,
+				colcount = 5;
+			for(var row=0; row<=rowcount-1; row++)
+			{
+				this.fieldCardslots.rows[row] = [];
+				for(var col=1; col<=colcount;col++)
+				{
+					var factor = ((col-1) <= 0) ? null : (col-1);
+					this.fieldCardslots.rows[row].push(
+						{x:offset.x+cardsAttr.padding*(col)+cardsAttr.w*(factor),y:offset.y+cardsAttr.padding*(row+1)+cardsAttr.h*(row),card:null}
+					);
+				}
+			}
 	}
 	,giveCards: function(){
 		$.each(this.playerCardslotsPos,function(direction,position){
 			for(var i=0;i<=position.length-1;i++){
-				Crafty.e("2D,DOM,Cardslot").attr({x:position[i][0], y:position[i][1]});
+				Crafty.e("2D,DOM,Cardslot").attr({x:position[i][0],y :position[i][1]});
 			}
 		});
 		var givenCards = [];
@@ -90,8 +63,8 @@ Crafty.c('table',{
 		$.each(fieldSlots,function(key,row){
 			if(key == 1 || key == 2 || key ==3)
 			{
-				Crafty.e("2D,DOM,Cardslot,FieldCardslot").attr({x:row[0].x, y:row[0].y});	//free left and right cardslot
-				Crafty.e("2D,DOM,Cardslot,FieldCardslot").attr({x:row[4].x, y:row[4].y});
+				Crafty.e("2D,DOM,FieldCardslot,Cardslot").FieldCardslot(key,0).attr({x:row[0].x, y:row[0].y});	//free left and right cardslot
+				Crafty.e("2D,DOM,FieldCardslot,Cardslot").FieldCardslot(key,4).attr({x:row[4].x, y:row[4].y});
 				for(var col=1;col<=3;col++)
 				{
 					var randnumber = Math.floor((Math.random()*cards.length));
@@ -110,7 +83,8 @@ Crafty.c('table',{
 			{
 				for(var col=0;col<=row.length-1;col++)
 				{
-					Crafty.e("2D,DOM,Cardslot,FieldCardslot")
+					Crafty.e("2D,DOM,FieldCardslot,Cardslot")
+						.FieldCardslot(key,col)
 						.attr({
 							x:row[col].x,
 							y:row[col].y
@@ -138,8 +112,8 @@ Crafty.c('table',{
 			this.player[this.turn.player].turnOver();
 			this.turn.player = (this.turn.player == this.player[0].id) ? this.player[1].id : this.player[0].id;
 			this.player[this.turn.player].isTurn();
-			this.turn.move = 0;			
-		}		
+			this.turn.move = 0;
+		}
 	}
 	,newGame: function(){
 		var givenCards = this.giveCards();
@@ -158,7 +132,7 @@ Crafty.c('table',{
 		});
 		if(this.turn.player == null)
 		{
-			this.turn.player = this.player[0].id;	//randomize!!!!			
+			this.turn.player = this.player[0].id;	//randomize!!!!
 			this.player[this.turn.player].isTurn();
 		}
 	}

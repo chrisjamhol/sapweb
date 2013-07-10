@@ -12,8 +12,23 @@ Crafty.c('Rules',{
 			onepair: this.onepair
 			//,highcard: {}
 		}
-	},
-	straightflush: function(){
+	}
+	,check: function(lastCard){
+		var affectedCards = this.getAffectedCards(lastCard);
+			//check for highest hand
+		$.each(this.hands,function(key,hand){
+			if(hand())
+			{
+
+			}
+		});
+	}
+	,getAffectedCards: function(lastCard){
+		var startRow = lastCard.row;
+		var startCol = lastCard.col;
+		//return cards[];
+	}
+	,straightflush: function(){
 
 	return false;
 	},
@@ -44,5 +59,5 @@ Crafty.c('Rules',{
 	onepair: function(){
 
 		return false;
-	}	
+	}
 });
