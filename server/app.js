@@ -38,6 +38,7 @@ app.get('/',function(req,res){
 });
 
 //piping css and js
+app.get('/htmlmanifest.appcache',function(req,res){res.sendfile('htmlmanifest.appcache');});
 app.get('/public/scripts/:scriptName',function(req,res){res.sendfile(__publicPaths.publicScriptPath+req.params['scriptName']);});
 app.get('/public/styles/:styleName',function(req,res){res.sendfile(__publicPaths.publicStylePath+req.params['styleName']);});
 app.get('/public/sockets/:socketName',function(req,res){res.sendfile(__publicPaths.publicSocketPath+req.params['socketName']);});

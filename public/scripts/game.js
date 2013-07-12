@@ -1,13 +1,12 @@
 Game = {
 	start: function()
 	{
-		var spritepath = "/public/gamefiles/sprites/";
+		//var spritepath = "/public/gamefiles/sprites/";
+		var spritepath = "http://192.168.1.222/webroot_chris/test/"
 		var gamefilespath = "/public/gamefiles/";
-		loadComponents(['fps','card','player','table','rules','fieldcardslot'],function(){
+		loadComponents(['card','player','table','rules','fieldcardslot'],function(){
 			var cards = [];
 			Crafty.init(1000, 563);
-			// Crafty.e("FPS")
-			// 	.FPS('frame', 1);
 			//Crafty.canvas();
 				// c clubs
 				// d dimonds
@@ -51,8 +50,7 @@ Game = {
 			//save all avalible cards in cards[]
 			$.each(cardspos,function(key,pos){cards.push(key);});
 			//end load cards
-Crafty.sprite(50,50,"http://www.shoutmeloud.com/wp-content/uploads/2011/09/css-sprites.png?9792e1",{'icon':[2,2]});
-Crafty.sprite(60,73,'C:/xampp/htdocs/workspace/sapweb/public/gamefiles/sprites/test.png',{'test':[0,0]});
+
 			//other sprites
 			Crafty.sprite(70,83,gamefilespath+'images/cardslot.png',{'Cardslot':[0,0]},0);
 
@@ -60,31 +58,21 @@ Crafty.sprite(60,73,'C:/xampp/htdocs/workspace/sapweb/public/gamefiles/sprites/t
 			Crafty.scene("loading", function() {
 				//Crafty.background("#FFF");
 				var itemsToLoad = [
-									spritepath+"cards/cards.png",
-									'C:/xampp/htdocs/workspace/sapweb/public/gamefiles/sprites/test.png'
+									spritepath+"cards/cards.png"
 								  ];
 				Crafty.load(itemsToLoad, function() {
-					cacheImages(itemsToLoad);
 					Crafty.scene("main"); //after loading the icons, load main
 				},function(e){console.log(e);});
 			});
 			Crafty.scene("loading");
 
 			Crafty.scene("main", function() {
-			Crafty.background("url('"+gamefilespath+"background/background1.png')");
-			Crafty.e("2D,DOM,test,Draggable");
-			Crafty.e("2D,DOM,icon,Draggable");
+			Crafty.e("2D,DOM,Image").image(gamefilespath+'background/background1.png').attr({z:-1});
 				var playercount = 2;
 				var table = Crafty.e("2D,DOM,table").table(cards,playercount);
 				table.newGame();
 			});
 		});
-
-		function cacheImages(itemsToLoad){
-			$.each(itemsToLoad,function(){
-
-			});
-		}
 
 		function loadComponents(components,callback){
 			var loaded = 0;	var compLenght = components.length;
