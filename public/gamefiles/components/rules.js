@@ -13,51 +13,48 @@ Crafty.c('Rules',{
 			//,highcard: {}
 		}
 	}
-	,check: function(lastCard){
-		var affectedCards = this.getAffectedCards(lastCard);
-			//check for highest hand
-		$.each(this.hands,function(key,hand){
-			if(hand())
-			{
-
-			}
+	,check: function(rows){
+		var hits = [];
+		var that = this;
+		$.each(rows,function(key,row){
+			$.each(that.hands,function(count,hand){
+				var result = hand();
+				if(result.hit)
+					{hits.push(result);}
+			});
 		});
-	}
-	,getAffectedCards: function(lastCard){
-		var startRow = lastCard.row;
-		var startCol = lastCard.col;
-		//return cards[];
+		return hits;
 	}
 	,straightflush: function(){
-
-	return false;
+		var result = {hit:true};
+		return result;
 	},
 	fourofakind: function(){
-
-		return false;
+		var result = {hit:false};
+		return result;
 	},
 	fullhouse: function(){
-
-		return false;
+		var result = {hit:false};
+		return result;
 	},
 	flush: function(){
-
-		return false;
+		var result = {hit:false};
+		return result;
 	},
 	staight: function(){
-
-		return false;
+		var result = {hit:false};
+		return result;
 	},
 	threeofakind: function(){
-
-		return false;
+		var result = {hit:false};
+		return result;
 	},
 	twopair: function(){
-
-		return false;
+		var result = {hit:false};
+		return result;
 	},
 	onepair: function(){
-
-		return false;
+		var result = {hit:false};
+		return result;
 	}
 });

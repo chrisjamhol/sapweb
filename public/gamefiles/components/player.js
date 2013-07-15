@@ -39,7 +39,6 @@ Crafty.c('player',{
 					.bind("StopDrag", function(data) {
 						//console.log(data);
 						var chosencardslot = this.dropped();
-						//this.table.showdown(chosencardslot);
 					})
 			);
 			this.stackcards.splice(randnumber,1);

@@ -15,28 +15,31 @@ Crafty.c('Card',{
 	,dropped: function(){
 		this.requires('Collision');
 		this.onHit('FieldCardslot',function(data){
-			this.unbind('EnterFrame');
-			var cardslot = data[0].obj;
-			console.log(cardslot);
-			if(cardslot != null && cardslot.value==null)
+			var slot = data[0].obj;
+			if(slot.checkEnabled() && !slot.checkTaken())
 			{
-				cardslot.requires('Collision');
-				cardslot.collision(
-				    new Crafty.polygon(
-				    	[this.w*0.3,this.h*0.3],
-				    	[this.w*0.7,this.h*0.3],
-				    	[this.w*0.7,this.h*0.7],
-				    	[this.w*0.3,this.h*0.3])
-				);
-				cardslot.onHit('Card',function(data){
-					this.unbind("EnterFrame");
-					var card = data[0].obj;
-					card.x = this.x+5;
-					card.y = this.y+5;
-					card.table.cardDropped(card,this);
-					card.droppedCorrect = true;
-					return this;
-				});
+				this.unbind('EnterFrame');
+				var cardslot = data[0].obj;
+				if(cardslot != null && cardslot.value==null)
+				{
+					cardslot.requires('Collision');
+					cardslot.collision(
+					    new Crafty.polygon(
+					    	[this.w*0.3,this.h*0.3],
+					    	[this.w*0.7,this.h*0.3],
+					    	[this.w*0.7,this.h*0.7],
+					    	[this.w*0.3,this.h*0.3])
+					);
+					cardslot.onHit('Card',function(data){
+						this.unbind("EnterFrame");
+						var card = data[0].obj;
+						card.x = this.x+5;
+						card.y = this.y+5;
+						card.table.cardDropped(card,this);
+						card.droppedCorrect = true;
+						return this;
+					});
+				}
 			}
 		});
 		var that = this;
@@ -57,10 +60,5 @@ Crafty.c('Card',{
 			}
 			window.clearInterval(interval);
 		},100);
-
-		// console.log(this.x);
-		// console.log(this.origin());
-		// console.log(this.pos());
-		// console.log(this);
 	}
 });

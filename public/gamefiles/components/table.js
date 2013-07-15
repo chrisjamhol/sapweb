@@ -31,6 +31,16 @@ Crafty.c('table',{
 			//init battelfield
 		this.fieldCardslots = {
 			getSlots: function(){return this.rows;},
+			modify: function(operator)
+			{
+				$.each(this.rows,function(count,row){
+					$.each(row,function(col,slot){
+						if(slot.obj !== null){
+							slot.obj[operator]();
+						}
+					});
+				});
+			},
 			rows: []
 		};
 				//seting up the positions for the fieldcardslots
@@ -45,7 +55,7 @@ Crafty.c('table',{
 				{
 					var factor = ((col-1) <= 0) ? null : (col-1);
 					this.fieldCardslots.rows[row].push(
-						{x:offset.x+cardsAttr.padding*(col)+cardsAttr.w*(factor),y:offset.y+cardsAttr.padding*(row+1)+cardsAttr.h*(row),card:null}
+						{x:offset.x+cardsAttr.padding*(col)+cardsAttr.w*(factor),y:offset.y+cardsAttr.padding*(row+1)+cardsAttr.h*(row),obj:null,card:null}
 					);
 				}
 			}
@@ -63,8 +73,9 @@ Crafty.c('table',{
 		$.each(fieldSlots,function(key,row){
 			if(key == 1 || key == 2 || key ==3)
 			{
-				Crafty.e("2D,DOM,FieldCardslot,Cardslot").FieldCardslot(key,0).attr({x:row[0].x, y:row[0].y});	//free left and right cardslot
-				Crafty.e("2D,DOM,FieldCardslot,Cardslot").FieldCardslot(key,4).attr({x:row[4].x, y:row[4].y});
+
+				row[0].obj = Crafty.e("2D,DOM,FieldCardslot,Cardslot").FieldCardslot(key,0).attr({x:row[0].x, y:row[0].y});	//free left and right cardslot
+				row[4].obj = Crafty.e("2D,DOM,FieldCardslot,Cardslot").FieldCardslot(key,4).attr({x:row[4].x, y:row[4].y});
 				for(var col=1;col<=3;col++)
 				{
 					var randnumber = Math.floor((Math.random()*cards.length));
@@ -83,12 +94,12 @@ Crafty.c('table',{
 			{
 				for(var col=0;col<=row.length-1;col++)
 				{
-					Crafty.e("2D,DOM,FieldCardslot,Cardslot")
-						.FieldCardslot(key,col)
-						.attr({
-							x:row[col].x,
-							y:row[col].y
-						});
+					row[col].obj = Crafty.e("2D,DOM,FieldCardslot,Cardslot")
+										.FieldCardslot(key,col)
+										.attr({
+											x:row[col].x,
+											y:row[col].y
+										});
 				}
 			}
 		});
@@ -104,16 +115,83 @@ Crafty.c('table',{
 		// }
 	}
 	,cardDropped: function(card,cardslot){
-		console.log(this.turn);
+		cardslot.setTaken();
+		this.fieldCardslots.rows[cardslot.row][cardslot.col].card = card;
 		if(this.turn.move < 1)
-		{this.turn.move++;}
+		{
+			this.limitDropzones(cardslot,this.fieldCardslots);
+			this.turn.move++;
+		}
 		else
 		{
-			this.player[this.turn.player].turnOver();
-			this.turn.player = (this.turn.player == this.player[0].id) ? this.player[1].id : this.player[0].id;
-			this.player[this.turn.player].isTurn();
-			this.turn.move = 0;
+			var that = this;
+			this.checkForHits(cardslot,this.fieldCardslots,function(hits){
+				console.log(hits);
+				that.player[that.turn.player].turnOver();
+				that.turn.player = (that.turn.player == that.player[0].id) ? that.player[1].id : that.player[0].id;
+				that.player[that.turn.player].isTurn();
+				that.turn.move = 0;
+				//------------> enable all slots with no card <----------------
+				$.each(that.fieldCardslots.rows,function(count,row){
+					$.each(row,function(col,slot){
+						if(slot.card == null && slot.obj != null){slot.obj.enable();}
+					});
+				});
+			});
 		}
+	}
+	,limitDropzones: function(sourceCardslot,fieldcardslots){
+		var row = sourceCardslot.row, col = sourceCardslot.col;
+		//------------> disable all <----------------
+		fieldcardslots.modify('disable');
+		//------------> enable allowed <----------------
+			//easy cols and rows
+		if( row > 0 && row < 4 )		//vertiacl
+		{
+			if(col == 0){fieldcardslots.rows[row][4].obj.enable();}
+			else if(col == 4){fieldcardslots.rows[row][0].obj.enable();}
+		}
+		else if( col > 0 && col <4 )	//horizontal
+		{
+			if(row == 0){fieldcardslots.rows[4][col].obj.enable();}
+			else if(row == 4){fieldcardslots.rows[4][col].obj.enable();}
+		}
+			//corners
+		else if(row == 0 && col == 0)	//top left
+		{fieldcardslots.rows[4][4].obj.enable();}
+		else if(row == 4 && col == 0)	//bottom left
+		{fieldcardslots.rows[0][4].obj.enable();}
+		else if(row == 0 && col == 4)	//top right
+		{fieldcardslots.rows[4][0].obj.enable();}
+		else if(row == 4 && col == 4)	//bottom right
+		{fieldcardslots.rows[0][0].obj.enable();}
+	}
+	,checkForHits: function(sourceCardslot,fieldcardslots,callback){
+		var row = sourceCardslot.row, col = sourceCardslot.col;
+		var affectedRows = [];
+		console.log("chekcing for hits: "+row+" / "+col);
+		if(row == 0 && (col == 0 || col == 4) || ((row > 0 && row < 4 ) && (col == 0 || col == 4)) || (row == 4 && (col == 0 || col == 4)) )
+		{
+			this.rules.check(fieldcardslots.rows[row]);
+		}
+			//corners
+		else if(row == 0 && col == 0)	//top left
+		{
+
+		}
+		else if(row == 4 && col == 0)	//bottom left
+		{
+
+		}
+		else if(row == 0 && col == 4)	//top right
+		{
+
+		}
+		else if(row == 4 && col == 4)	//bottom right
+		{
+
+		}
+		callback("hits");
 	}
 	,newGame: function(){
 		var givenCards = this.giveCards();
