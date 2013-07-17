@@ -62,12 +62,14 @@ Game = {
 								  ];
 				Crafty.load(itemsToLoad, function() {
 					Crafty.scene("main"); //after loading the icons, load main
-				},function(e){console.log(e);});
+				},function(e){
+					//console.log(e);
+				});
 			});
 			Crafty.scene("loading");
 
 			Crafty.scene("main", function() {
-			Crafty.e("2D,DOM,Image").image(gamefilespath+'background/background1.png').attr({z:-1});
+				Crafty.e("2D,DOM,Image").image(gamefilespath+'background/background1.png').attr({z:-1});
 				var playercount = 2;
 				var table = Crafty.e("2D,DOM,table").table(cards,playercount);
 				table.newGame();
