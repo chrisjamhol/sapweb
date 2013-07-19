@@ -32,13 +32,13 @@ Game = {
 				// else if(i <= 10)	//numberd cards
 				// 	{cardspos["c"+i] = pos1;cardspos["d"+i] = pos2;cardspos["h"+i] = pos3;cardspos["s"+i] = pos4;}
 				else if(i == 11)	//aces
-					{cardspos["ac"] = pos1;cardspos["ad"] = pos2;cardspos["ah"] = pos3;cardspos["as"] = pos4;}
+					{cardspos["ca"] = pos1;cardspos["da"] = pos2;cardspos["ha"] = pos3;cardspos["sa"] = pos4;}
 				else if(i == 12)	//jackes
-					{cardspos["jc"] = pos1;cardspos["jd"] = pos2;cardspos["jh"] = pos3;cardspos["js"] = pos4;}
+					{cardspos["cj"] = pos1;cardspos["dj"] = pos2;cardspos["hj"] = pos3;cardspos["sj"] = pos4;}
 				else if(i == 13)	//kings
-					{cardspos["kc"] = pos1;cardspos["kd"] = pos2;cardspos["kh"] = pos3;cardspos["ks"] = pos4;}
+					{cardspos["ck"] = pos1;cardspos["dk"] = pos2;cardspos["hk"] = pos3;cardspos["sk"] = pos4;}
 				else if(i == 14)	//queens
-					{cardspos["qc"] = pos1;cardspos["qd"] = pos2;cardspos["qh"] = pos3;cardspos["qs"] = pos4;}
+					{cardspos["cq"] = pos1;cardspos["dq"] = pos2;cardspos["hq"] = pos3;cardspos["sq"] = pos4;}
 				else if(i == 15)	//jocker
 				{
 					var jokerCount = 2;

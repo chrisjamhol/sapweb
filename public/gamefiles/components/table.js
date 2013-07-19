@@ -169,10 +169,11 @@ Crafty.c('table',{
 	,checkForHits: function(sourceCardslot,fieldcardslots,callback){
 		var row = sourceCardslot.row, col = sourceCardslot.col;
 		var affectedRows = [];
+		var rows = [];
 		console.log("chekcing for hits: "+row+" / "+col);
 		if(row == 0 && (col == 0 || col == 4) || ((row > 0 && row < 4 ) && (col == 0 || col == 4)) || (row == 4 && (col == 0 || col == 4)) )
 		{
-			this.rules.check(fieldcardslots.rows[row]);
+			rows.push(fieldcardslots.rows[row]);
 		}
 			//corners
 		else if(row == 0 && col == 0)	//top left
@@ -191,7 +192,7 @@ Crafty.c('table',{
 		{
 
 		}
-		callback("hits");
+		callback(this.rules.check(rows));
 	}
 	,newGame: function(){
 		var givenCards = this.giveCards();

@@ -16,6 +16,7 @@ Crafty.c('Rules',{
 	,check: function(rows){
 		var hits = [];
 		var that = this;
+		console.log("checking");
 		$.each(rows,function(key,row){
 			// $.each(that.hands,function(count,hand){
 			// 	var result = hand();
@@ -23,14 +24,15 @@ Crafty.c('Rules',{
 			// 		{hits.push(result);}
 			// });
 		//switch highest occurrences
-			var occurrences = this.countOccurrences(row);
-			switch(occurrences){
-			//--- highest occurrences: 1	----------------------------------------------------
-				case 1:
+			var occurrences = that.countOccurrences(row);
+			console.log(occurrences);
+			switch(occurrences.diff){
+			//--- different cards: 1	----------------------------------------------------
+				case 5:
 
 					break;
 			//--- highest occurrences: 2	----------------------------------------------------
-				case 2:
+				case 4:
 					//is two pair?
 						//if()
 						// {
@@ -46,14 +48,16 @@ Crafty.c('Rules',{
 
 					break;
 			//--- highest occurrences: 4 ----------------------------------------------------
-				case 4:
-					hits.push({
+				case 2:
+
+					break;
+			}
+			/*
+				hits.push({
 						rank:7,
 						type: "Four of a Kind"
 					});
-					break;
-			}
-
+			*/
 			//check for flush
 
 		});
@@ -63,23 +67,38 @@ Crafty.c('Rules',{
 		//count occurrences
 		 	var highest = {2:3,a:2};
 		var occ = {};
-		row.forEach(function(key,value){
-			if(typeof(occ[value]) !== "undefinded")
+		var suits = {};
+		occ['high'] = {count: 0,value: null};
+		occ['values'] = {};
+		occ['suits'] = {};
+		$.each(row,function(key,slot){
+			var suit = slot.card.value[0];
+			var value = slot.card.value[1];
+			if(typeof(occ.values[value]) != "undefined")
 			{
-				occ[value]++;
+				occ.values[value]++;
 			}
 			else
 			{
-				occ.push({value: 1});
+				occ.values[value] = 1;
 			}
-		});
-		occ.forEach(function(key,value){
-			if(typeof(occ.high) == "undefinded" || (typeof(occ.high) != "undefinded") && occ.high <= value)
+			if(typeof(occ.suits[suit]) != "undefined")
 			{
-				occ['high'] = value;
+				occ.suits[suit]++;
+			}
+			else
+			{
+				occ.suits[suit] = 1;
 			}
 		});
-
+		$.each(occ.values,function(key,value){
+			if(typeof(occ.high) == "undefined" || (typeof(occ.high) != "undefined") && occ.high.count <= value)
+			{
+				occ.high['count'] = value;
+				occ.high['value'] = key;
+			}
+		});
+		occ['diff'] = Object.keys(occ.values).length;
 		return occ;
 	}
 
