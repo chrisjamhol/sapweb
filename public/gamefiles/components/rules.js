@@ -18,48 +18,153 @@ Crafty.c('Rules',{
 		var that = this;
 		console.log("checking");
 		$.each(rows,function(key,row){
-			// $.each(that.hands,function(count,hand){
-			// 	var result = hand();
-			// 	if(result.hit)
-			// 		{hits.push(result);}
-			// });
 		//switch highest occurrences
-			var occurrences = that.countOccurrences(row);
-			console.log(occurrences);
-			switch(occurrences.diff){
-			//--- different cards: 1	----------------------------------------------------
+			var occ = that.countOccurrences(row);
+			var result = {rank:null,name:null}
+			//--- testcase -----
+					// occ = {
+					// 		diff: 5,
+					// 		jocker: 1,
+					// 		high:   {
+					// 					count: 1,
+					// 					value: 8
+					// 			    },
+					// 		suits:  {
+					// 					c: 4,
+					// 					j: 1
+					// 		        },
+					// 		values: {
+					// 					8: 1,
+					// 					7: 1,
+					// 					6: 1,
+					// 					5: 1,
+					// 					1: 1
+					// 				}
+					// 	  };
+			//--- /testcase ----
+			console.log(occ);
+			switch(occ.diff){
+			//--- different card values: 1	----------------------------------------------------
+					//staight
 				case 5:
+					var failsafe = false;
+					var limit = occ.high.value-5;
+					var takenJocker = 0;
+					for (var i = occ.high.value; i > limit; i--) {	//straight
+						if(typeof(occ.values[i]) == "undefined")
+						{
+							if(occ.jocker && takenJocker < occ.jocker)
+								{takenJocker++;}
+							else
+								{failsafe = true;}
+						}
+						else
+							{failsafe = false;}
 
+						if(failsafe){break;}
+					};
+					if(failsafe == false)
+					{
+						result.rank = 4;
+						result.name = "Staight";
+					}
+					else	//check jocker
+					{
+						if(occ.jocker)		//one pair
+						{
+							result.rank = 1;
+							result.name = "One Pair";
+						}
+					}
 					break;
-			//--- highest occurrences: 2	----------------------------------------------------
+			//--- different card values: 4	----------------------------------------------------
+					//pair
 				case 4:
-					//is two pair?
-						//if()
-						// {
-
-						// }
-						// else if()
-						// {
-
-						// }
+					if(occ.jocker)		//one pair
+					{
+						result.rank = 3;
+						result.name = "Three of a Kind";
+					}
+					else
+					{
+						result.rank = 1;
+						result.name = "One Pair";
+					}
 					break;
-			//--- highest occurrences: 3 ----------------------------------------------------
+
+			//--- different card values: 3 ----------------------------------------------------
+					//three of a kind
+					//two pair
 				case 3:
-
+					if(occ.high.count == 3)	//three of a kind
+					{
+						if(occ.jocker)
+						{
+							result.rank = 7;
+							result.name = "Four of a kind";
+						}
+						else
+						{
+							result.rank = 3;
+							result.name = "Three of a kind";
+						}
+					}
+					else if(occ.high.count == 2) //two pair
+					{
+						if(occ.jocker)
+						{
+							result.rank = 6;
+							result.name = "Full House";
+						}
+						else
+						{
+							result.rank = 2;
+							result.name = "Two Pair";
+						}
+					}
 					break;
-			//--- highest occurrences: 4 ----------------------------------------------------
-				case 2:
 
+			//--- different card values: 2 ----------------------------------------------------
+					//four of a kind
+					//full house
+				case 2:
+					if(occ.high.count == 4)
+					{
+						if(occ.jocker)
+						{
+							result.rank = 7;
+							result.name= "Four of a Kind";
+						}
+						else
+						{
+							result.rank = 9;
+							result.name = "Five of a Kind";
+						}
+					}
+					else if(occ.high.count == 3)
+					{
+						result.rank = 6;
+						result.name= "Full House";
+					}
 					break;
 			}
-			/*
-				hits.push({
-						rank:7,
-						type: "Four of a Kind"
-					});
-			*/
-			//check for flush
 
+			//--- flush variants ----------------------------------------------------
+			if(Object.keys(occ.suits).length == 1)
+			{
+				if(result.rank == 4)		//straight flush
+				{
+					result.rank = 8;
+					result.name = "Staight Flush";
+				}
+				else if(result.rank < 5)	//flush
+				{
+					result.rank = 5;
+					result.name = "Flush";
+				}
+			}
+
+			if(result.rank != null){hits.push(result);}
 		});
 		return hits;
 	}
@@ -71,9 +176,10 @@ Crafty.c('Rules',{
 		occ['high'] = {count: 0,value: null};
 		occ['values'] = {};
 		occ['suits'] = {};
+		console.log(occ);
 		$.each(row,function(key,slot){
 			var suit = slot.card.value[0];
-			var value = slot.card.value[1];
+			var value = (slot.card.value.length == 3) ? slot.card.value[1]+slot.card.value[2] : slot.card.value[1];
 			if(typeof(occ.values[value]) != "undefined")
 			{
 				occ.values[value]++;
@@ -99,6 +205,13 @@ Crafty.c('Rules',{
 			}
 		});
 		occ['diff'] = Object.keys(occ.values).length;
+
+		// jocker
+		if(typeof(occ.suits.j) != "undefined")
+		{
+			occ['jocker'] = occ.suits.j;
+			delete occ.suits.j;
+		}
 		return occ;
 	}
 

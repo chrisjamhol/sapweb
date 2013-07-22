@@ -170,27 +170,42 @@ Crafty.c('table',{
 		var row = sourceCardslot.row, col = sourceCardslot.col;
 		var affectedRows = [];
 		var rows = [];
-		console.log("chekcing for hits: "+row+" / "+col);
-		if(row == 0 && (col == 0 || col == 4) || ((row > 0 && row < 4 ) && (col == 0 || col == 4)) || (row == 4 && (col == 0 || col == 4)) )
+			//corners
+		if( (row == 0 && col == 0) || (row == 4 && col == 4) )	//top left to bottom right
+		{
+			var rowObj = [];
+			var colcount = 0;
+			for(var i = 0; i <= 4; i++)
+			{
+				rowObj.push(fieldcardslots.rows[i][colcount]);
+				colcount++;
+			}
+			rows.push(rowObj);
+		}
+		else if( (row == 4 && col == 0) || (row == 0 && col == 4))	//top right to bottom left
+		{
+			var rowObj = [];
+			var colcount = 4;
+			for(var i = 0; i <= 4; i++)
+			{
+				rowObj.push(fieldcardslots.rows[i][colcount]);
+				colcount--;
+			}
+			rows.push(rowObj);
+		}
+			//horizontal
+		else if(row == 0 && (col == 0 || col == 4) || ((row > 0 && row < 4 ) && (col == 0 || col == 4)) || (row == 4 && (col == 0 || col == 4)) )
 		{
 			rows.push(fieldcardslots.rows[row]);
 		}
-			//corners
-		else if(row == 0 && col == 0)	//top left
+			//vertical
+		else if(col == 0 && (row == 0 || row == 4) || ((col > 0 && col < 4 ) && (row == 0 || row == 4)) || (col == 4 && (row == 0 || row == 4)))
 		{
-
-		}
-		else if(row == 4 && col == 0)	//bottom left
-		{
-
-		}
-		else if(row == 0 && col == 4)	//top right
-		{
-
-		}
-		else if(row == 4 && col == 4)	//bottom right
-		{
-
+			var rowObj = [];
+			for(var i = 4; i >= 0; i--) {
+				rowObj.push(fieldcardslots.rows[i][col]);
+			};
+			rows.push(rowObj);
 		}
 		callback(this.rules.check(rows));
 	}

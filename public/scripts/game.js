@@ -29,21 +29,21 @@ Game = {
 
 				if(i == 2)			//2's cards
 				{cardspos["c"+2] = [0,0];cardspos["d"+2] = [1,0];cardspos["h"+2] = [2,0];cardspos["s"+2] = [3,0];}
-				// else if(i <= 10)	//numberd cards
-				// 	{cardspos["c"+i] = pos1;cardspos["d"+i] = pos2;cardspos["h"+i] = pos3;cardspos["s"+i] = pos4;}
+				else if(i <= 10)	//numberd cards
+					{cardspos["c"+i] = pos1;cardspos["d"+i] = pos2;cardspos["h"+i] = pos3;cardspos["s"+i] = pos4;}
 				else if(i == 11)	//aces
-					{cardspos["ca"] = pos1;cardspos["da"] = pos2;cardspos["ha"] = pos3;cardspos["sa"] = pos4;}
+					{cardspos["c14"] = pos1;cardspos["d14"] = pos2;cardspos["h14"] = pos3;cardspos["s14"] = pos4;}
 				else if(i == 12)	//jackes
-					{cardspos["cj"] = pos1;cardspos["dj"] = pos2;cardspos["hj"] = pos3;cardspos["sj"] = pos4;}
+					{cardspos["c11"] = pos1;cardspos["d11"] = pos2;cardspos["h11"] = pos3;cardspos["s11"] = pos4;}
 				else if(i == 13)	//kings
-					{cardspos["ck"] = pos1;cardspos["dk"] = pos2;cardspos["hk"] = pos3;cardspos["sk"] = pos4;}
+					{cardspos["c13"] = pos1;cardspos["d13"] = pos2;cardspos["h13"] = pos3;cardspos["s13"] = pos4;}
 				else if(i == 14)	//queens
-					{cardspos["cq"] = pos1;cardspos["dq"] = pos2;cardspos["hq"] = pos3;cardspos["sq"] = pos4;}
+					{cardspos["c12"] = pos1;cardspos["d12"] = pos2;cardspos["h12"] = pos3;cardspos["s12"] = pos4;}
 				else if(i == 15)	//jocker
 				{
 					var jokerCount = 2;
 					for(var j=1; j<=jokerCount;j++)
-					{cardspos["j"+j] = pos1;}
+					{cardspos["j1"] = pos1;}
 				}
 			}
 			Crafty.sprite(60,72,spritepath+"cards/cards.png",cardspos,0);
