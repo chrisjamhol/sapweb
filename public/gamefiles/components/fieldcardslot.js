@@ -19,4 +19,8 @@ Crafty.c('FieldCardslot',{
 	,setTaken: function(){this.taken = true;}
 	,checkEnabled: function(){return this.enabled;}
 	,checkTaken: function(){return this.taken;}
+	,reset: function(){
+		this.enabled = true;
+		this.taken = false;
+	}
 });

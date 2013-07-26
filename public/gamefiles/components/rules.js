@@ -10,13 +10,11 @@ Crafty.c('Rules',{
 			threeofakind: this.threeofakind,
 			twopair: this.twopair,
 			onepair: this.onepair
-			//,highcard: {}
 		}
 	}
 	,check: function(rows){
 		var hits = [];
 		var that = this;
-		console.log("checking");
 		$.each(rows,function(key,row){
 		//switch highest occurrences
 			var occ = that.countOccurrences(row);
@@ -42,7 +40,6 @@ Crafty.c('Rules',{
 					// 				}
 					// 	  };
 			//--- /testcase ----
-			console.log(occ);
 			switch(occ.diff){
 			//--- different card values: 1	----------------------------------------------------
 					//staight
@@ -176,7 +173,6 @@ Crafty.c('Rules',{
 		occ['high'] = {count: 0,value: null};
 		occ['values'] = {};
 		occ['suits'] = {};
-		console.log(occ);
 		$.each(row,function(key,slot){
 			var suit = slot.card.value[0];
 			var value = (slot.card.value.length == 3) ? slot.card.value[1]+slot.card.value[2] : slot.card.value[1];

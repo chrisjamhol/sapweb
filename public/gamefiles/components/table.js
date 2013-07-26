@@ -1,5 +1,6 @@
 Crafty.c('table',{
 	handcardsCount: 4,
+	allCards: null,
 	cards: null,
 	fieldCardslots: null,
 	player: [],
@@ -10,19 +11,21 @@ Crafty.c('table',{
 		player: null,
 		move: 0
 	},
+	rounds: 0,
+	moves: 0,
+	playerCardslots: {},
 	playerCardslotsPos: {
 					top:[[560,25],[660,25],[760,25],[860,25]],
 					bottom:[[560,440],[660,440],[760,440],[860,440]]
 				  },
 	table: function(cards,playercount){
 		this.cards = cards;
+		this.allCards = cards;
 		this.playercount = playercount;
 		//create player
 		for(var i=0;i<=this.playercount-1;i++)
 		{
-			this.player.push(
-				Crafty.e("2D, DOM, player,life")
-			);
+			this.player.push({obj: Crafty.e("2D, DOM, player,life"), cardslots: null});
 		}
 		this.rules = Crafty.e("Rules");
 		return this;
@@ -60,13 +63,82 @@ Crafty.c('table',{
 				}
 			}
 	}
-	,giveCards: function(){
+	,newGame: function(){
+		var that = this;
+		var playercount = 0;
+
 		$.each(this.playerCardslotsPos,function(direction,position){
+			var playerCardslots = {};
 			for(var i=0;i<=position.length-1;i++){
-				Crafty.e("2D,DOM,Cardslot").attr({x:position[i][0],y :position[i][1]});
+				playerCardslots[i] = Crafty.e("2D,DOM,Cardslot").attr({x:position[i][0], y:position[i][1], hasCard: false});
 			}
+			that.playerCardslots[direction] = [];
+			that.playerCardslots[direction].push(playerCardslots);
+			that.player[playercount].cardslots = playerCardslots;
+			playercount++;
 		});
-		var givenCards = [];
+
+		$.each(this.player,function(key,player){
+			var playerHp = 100;
+			player.obj
+				.player(
+					key,
+					playerHp,
+					// that.shuffle(that.cards),
+					that,
+					that.directions[key],
+					that.player[key].cardslots
+				);
+				// .drawCards();
+		});
+		this.round = 0;
+		this.newRound();
+	}
+	,newRound: function(){
+		var that = this;
+		this.shuffle(this.cards);
+
+		if(this.round != 0)
+		{
+			this.clearCards();
+		}
+		this.giveCards();
+		$.each(this.player,function(key,player){
+			player.obj.resetStackcards();
+			player.obj.setCards(that.shuffle(that.cards));
+			player.obj.drawCards();
+		});
+
+		if(this.turn.player == null)	//first round
+		{
+			this.turn.player = this.player[0].obj.id;	//randomize!!!!
+			this.player[this.turn.player].obj.isTurn();
+		}
+		else
+		{
+			this.player[this.turn.player].obj.turnOver();
+			this.turn.player = (this.turn.player == this.player[0].obj.id) ? this.player[1].obj.id : this.player[0].obj.id;
+			this.player[this.turn.player].obj.isTurn();
+			this.turn.move = 0;
+		}
+
+		$.each(this.fieldCardslots.rows,function(count,row){
+			$.each(row,function(col,slot){
+				if(slot.card == null && slot.obj != null){slot.obj.reset();}
+			});
+		});
+	}
+	,clearCards: function(){
+		$.each(Crafty("Card"),function(key,cardId){
+			this.cards = this.allCards;
+			Crafty(cardId).destroy();
+		});
+		$.each(Crafty("FieldCardslot"),function(key,slot){
+			Crafty(slot).destroy();
+		});
+	}
+	,giveCards: function(){
+		var that = this;
 			//playing cards
 		var fieldSlots = this.fieldCardslots.getSlots();
 		var cards = this.cards;
@@ -86,7 +158,6 @@ Crafty.c('table',{
 									value: cards[randnumber]
 								})
 					row[col].card = card;
-					givenCards.push(cards[randnumber]);
 					cards.splice(randnumber,1);
 				}
 			}
@@ -103,18 +174,9 @@ Crafty.c('table',{
 				}
 			}
 		});
-		return givenCards;
-		//to show all cards
-		// var y = 0; var height = 72+5;var x = 0; var width = 60+5;var stacklength = this.stackcards.length;
-		// for(var i=0;i<=stacklength-1;i++){
-		// 	var randnumber = Math.floor((Math.random()*this.stackcards.length));
-		// 	if((i%15)==0){x=0;y++;}
-		// 	randomcards.push(Crafty.e("2D, DOM, Card, Draggable, "+this.stackcards[randnumber]).attr({x: (x*width),y: (y*height)}));
-		// 	x++;
-		// 	this.stackcards.splice(randnumber,1);
-		// }
 	}
 	,cardDropped: function(card,cardslot){
+		console.log("hj");
 		cardslot.setTaken();
 		this.fieldCardslots.rows[cardslot.row][cardslot.col].card = card;
 		if(this.turn.move < 1)
@@ -127,16 +189,27 @@ Crafty.c('table',{
 			var that = this;
 			this.checkForHits(cardslot,this.fieldCardslots,function(hits){
 				console.log(hits);
-				that.player[that.turn.player].turnOver();
-				that.turn.player = (that.turn.player == that.player[0].id) ? that.player[1].id : that.player[0].id;
-				that.player[that.turn.player].isTurn();
-				that.turn.move = 0;
 				//------------> enable all slots with no card <----------------
-				$.each(that.fieldCardslots.rows,function(count,row){
-					$.each(row,function(col,slot){
-						if(slot.card == null && slot.obj != null){slot.obj.enable();}
+				if(that.moves < 7)
+				{
+					that.player[that.turn.player].obj.turnOver();
+					that.turn.player = (that.turn.player == that.player[0].obj.id) ? that.player[1].obj.id : that.player[0].obj.id;
+					that.player[that.turn.player].obj.isTurn();
+					that.turn.move = 0;
+
+					$.each(that.fieldCardslots.rows,function(count,row){
+						$.each(row,function(col,slot){
+							if(slot.card == null && slot.obj != null){slot.obj.enable();}
+						});
 					});
-				});
+					that.moves++;
+				}
+				else 					//round over
+				{
+					that.round++;
+					that.newRound();
+					that.moves = 0;
+				}
 			});
 		}
 	}
@@ -146,25 +219,28 @@ Crafty.c('table',{
 		fieldcardslots.modify('disable');
 		//------------> enable allowed <----------------
 			//easy cols and rows
-		if( row > 0 && row < 4 )		//vertiacl
+		if( (row > 0 && row < 4) && (col == 0 || col == 4) )		//horizontal
 		{
 			if(col == 0){fieldcardslots.rows[row][4].obj.enable();}
 			else if(col == 4){fieldcardslots.rows[row][0].obj.enable();}
 		}
-		else if( col > 0 && col <4 )	//horizontal
+		else if( (col > 0 && col < 4) && (row == 0 || row == 4) )	//vertical
 		{
 			if(row == 0){fieldcardslots.rows[4][col].obj.enable();}
-			else if(row == 4){fieldcardslots.rows[4][col].obj.enable();}
+			else if(row == 4){fieldcardslots.rows[0][col].obj.enable();}
 		}
+		else if( (row == 0 || row == 4) && (col == 0 || col == 4) )
+		{
 			//corners
-		else if(row == 0 && col == 0)	//top left
-		{fieldcardslots.rows[4][4].obj.enable();}
-		else if(row == 4 && col == 0)	//bottom left
-		{fieldcardslots.rows[0][4].obj.enable();}
-		else if(row == 0 && col == 4)	//top right
-		{fieldcardslots.rows[4][0].obj.enable();}
-		else if(row == 4 && col == 4)	//bottom right
-		{fieldcardslots.rows[0][0].obj.enable();}
+			if(row == 0 && col == 0)	//top left
+			{fieldcardslots.rows[4][4].obj.enable();}
+			if(row == 4 && col == 0)	//bottom left
+			{fieldcardslots.rows[0][4].obj.enable();}
+			if(row == 0 && col == 4)	//top right
+			{fieldcardslots.rows[4][0].obj.enable();}
+			if(row == 4 && col == 4)	//bottom right
+			{fieldcardslots.rows[0][0].obj.enable();}
+		}
 	}
 	,checkForHits: function(sourceCardslot,fieldcardslots,callback){
 		var row = sourceCardslot.row, col = sourceCardslot.col;
@@ -182,7 +258,7 @@ Crafty.c('table',{
 			}
 			rows.push(rowObj);
 		}
-		else if( (row == 4 && col == 0) || (row == 0 && col == 4))	//top right to bottom left
+		if( (row == 4 && col == 0) || (row == 0 && col == 4))	//top right to bottom left
 		{
 			var rowObj = [];
 			var colcount = 4;
@@ -194,12 +270,12 @@ Crafty.c('table',{
 			rows.push(rowObj);
 		}
 			//horizontal
-		else if(row == 0 && (col == 0 || col == 4) || ((row > 0 && row < 4 ) && (col == 0 || col == 4)) || (row == 4 && (col == 0 || col == 4)) )
+		if((row > 0 && row < 4) && (col == 0 || col == 4))
 		{
 			rows.push(fieldcardslots.rows[row]);
 		}
 			//vertical
-		else if(col == 0 && (row == 0 || row == 4) || ((col > 0 && col < 4 ) && (row == 0 || row == 4)) || (col == 4 && (row == 0 || row == 4)))
+		if((col > 0 && col < 4) && (row == 0 || row == 4))
 		{
 			var rowObj = [];
 			for(var i = 4; i >= 0; i--) {
@@ -209,32 +285,8 @@ Crafty.c('table',{
 		}
 		callback(this.rules.check(rows));
 	}
-	,newGame: function(){
-		var givenCards = this.giveCards();
-		var that = this;
-		$.each(this.player,function(key,player){
-			var playerHp = 100;
-			player
-				.player(
-					key,
-					playerHp,
-					that.shuffle(that.cards),
-					that,that.directions[key],
-					that.getPlayerCardslots(that.directions[key])
-				)
-				.drawCards(4);
-		});
-		if(this.turn.player == null)
-		{
-			this.turn.player = this.player[0].id;	//randomize!!!!
-			this.player[this.turn.player].isTurn();
-		}
-	}
-	,getRandomCard: function(){
-		return
-	}
-	,shuffle: function(array){
-		var currentIndex = array.length
+	,shuffle: function(cards){
+		var currentIndex = cards.length
 	    , temporaryValue
 	    , randomIndex;
 		// While there remain elements to shuffle...
@@ -243,11 +295,11 @@ Crafty.c('table',{
 			randomIndex = Math.floor(Math.random() * currentIndex);
 			currentIndex -= 1;
 			// And swap it with the current element.
-			temporaryValue = array[currentIndex];
-			array[currentIndex] = array[randomIndex];
-			array[randomIndex] = temporaryValue;
+			temporaryValue = cards[currentIndex];
+			cards[currentIndex] = cards[randomIndex];
+			cards[randomIndex] = temporaryValue;
 		}
-		return array;
+		return cards;
 	}
 	,getPlayerCardslots: function(direction){return this.playerCardslotsPos[direction];}
 });

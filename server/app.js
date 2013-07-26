@@ -48,6 +48,6 @@ app.get('/public/libary/*',function(req,res){res.sendfile(__publicPaths.publicLi
 //piping gamefiles
 app.get('/public/components/*',function(req,res){res.sendfile(__publicPaths.publicComponentsPath+req.params[0]);});
 app.get('/public/gamefiles/*',function(req,res){
-    console.log(req.params[0]);
+    //console.log(req.params[0]);
     res.sendfile(__publicPaths.publicGamefilesPath+req.params[0]);
 });

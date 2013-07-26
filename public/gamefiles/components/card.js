@@ -6,13 +6,13 @@ Crafty.c('Card',{
 		y: null
 	},
 	droppedCorrect: false,
-	checkDroppedInterval: null,
 	Card: function(table){
 		this.table = table;
 		this.disableDrag();
 		return this;
 	}
-	,dropped: function(){
+	,dropped: function(callback){
+		var callback = callback;
 		this.requires('Collision');
 		this.onHit('FieldCardslot',function(data){
 			var slot = data[0].obj;
@@ -37,7 +37,7 @@ Crafty.c('Card',{
 						card.y = this.y+5;
 						card.table.cardDropped(card,this);
 						card.droppedCorrect = true;
-						return this;
+						callback(this);
 					});
 				}
 			}
@@ -53,6 +53,8 @@ Crafty.c('Card',{
 				}
 				that.x = that.oldpos.x;
 				that.y = that.oldpos.y;
+				console.log("dropped incorrect");
+				callback("undefined");
 			}
 			else
 			{
