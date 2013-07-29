@@ -44,6 +44,13 @@ Crafty.c('table',{
 					});
 				});
 			},
+			clearCards: function(){
+				$.each(this.rows,function(key,row){
+					$.each(row,function(col,slot){
+						slot.card = null;
+					});
+				});
+			},
 			rows: []
 		};
 				//seting up the positions for the fieldcardslots
@@ -136,6 +143,7 @@ Crafty.c('table',{
 		$.each(Crafty("FieldCardslot"),function(key,slot){
 			Crafty(slot).destroy();
 		});
+		this.fieldCardslots.clearCards();
 	}
 	,giveCards: function(){
 		var that = this;
@@ -176,9 +184,10 @@ Crafty.c('table',{
 		});
 	}
 	,cardDropped: function(card,cardslot){
-		console.log("hj");
+
 		cardslot.setTaken();
 		this.fieldCardslots.rows[cardslot.row][cardslot.col].card = card;
+
 		if(this.turn.move < 1)
 		{
 			this.limitDropzones(cardslot,this.fieldCardslots);

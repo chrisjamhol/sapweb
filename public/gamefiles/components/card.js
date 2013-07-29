@@ -20,6 +20,8 @@ Crafty.c('Card',{
 			{
 				this.unbind('EnterFrame');
 				var cardslot = data[0].obj;
+				console.log("enabled: "+slot.checkEnabled());
+				console.log("taken: "+slot.checkTaken());
 				if(cardslot != null && cardslot.value==null)
 				{
 					cardslot.requires('Collision');
@@ -53,7 +55,6 @@ Crafty.c('Card',{
 				}
 				that.x = that.oldpos.x;
 				that.y = that.oldpos.y;
-				console.log("dropped incorrect");
 				callback("undefined");
 			}
 			else
