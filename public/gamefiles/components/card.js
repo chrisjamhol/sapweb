@@ -20,8 +20,6 @@ Crafty.c('Card',{
 			{
 				this.unbind('EnterFrame');
 				var cardslot = data[0].obj;
-				console.log("enabled: "+slot.checkEnabled());
-				console.log("taken: "+slot.checkTaken());
 				if(cardslot != null && cardslot.value==null)
 				{
 					cardslot.requires('Collision');

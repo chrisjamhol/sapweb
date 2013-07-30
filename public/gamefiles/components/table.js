@@ -1,5 +1,4 @@
 Crafty.c('table',{
-	handcardsCount: 4,
 	allCards: null,
 	cards: null,
 	fieldCardslots: null,
@@ -25,16 +24,16 @@ Crafty.c('table',{
 		//create player
 		for(var i=0;i<=this.playercount-1;i++)
 		{
-			this.player.push({obj: Crafty.e("2D, DOM, player,life"), cardslots: null});
+			this.player[i] = Crafty.e("2D, DOM, player,life,weapon,shield").life(120);
 		}
 		this.rules = Crafty.e("Rules");
 		return this;
 	},
 	init: function(playercount){
-			//init battelfield
+			//init battelfield -> this.fieldCardslots (obj)
 		this.fieldCardslots = {
 			getSlots: function(){return this.rows;},
-			modify: function(operator)
+			modify: function(operator) 		//enable
 			{
 				$.each(this.rows,function(count,row){
 					$.each(row,function(col,slot){
@@ -44,7 +43,7 @@ Crafty.c('table',{
 					});
 				});
 			},
-			clearCards: function(){
+			clearCards: function(){			//clear from cards for new round or new game
 				$.each(this.rows,function(key,row){
 					$.each(row,function(col,slot){
 						slot.card = null;
@@ -53,27 +52,29 @@ Crafty.c('table',{
 			},
 			rows: []
 		};
-				//seting up the positions for the fieldcardslots
-			var offset = {x: 86, y: 70},
-				cardsAttr = {w: 70, h: 82, padding: 5},
-				rowcount = 5,
-				colcount = 5;
-			for(var row=0; row<=rowcount-1; row++)
+
+			//seting up the positions for the fieldcardslots
+		var offset = {x: 86, y: 70},
+			cardsAttr = {w: 70, h: 82, padding: 5},
+			rowcount = 5,
+			colcount = 5;
+		for(var row=0; row<=rowcount-1; row++)
+		{
+			this.fieldCardslots.rows[row] = [];
+			for(var col=1; col<=colcount;col++)
 			{
-				this.fieldCardslots.rows[row] = [];
-				for(var col=1; col<=colcount;col++)
-				{
-					var factor = ((col-1) <= 0) ? null : (col-1);
-					this.fieldCardslots.rows[row].push(
-						{x:offset.x+cardsAttr.padding*(col)+cardsAttr.w*(factor),y:offset.y+cardsAttr.padding*(row+1)+cardsAttr.h*(row),obj:null,card:null}
-					);
-				}
+				var factor = ((col-1) <= 0) ? null : (col-1);
+				this.fieldCardslots.rows[row].push(
+					{x:offset.x+cardsAttr.padding*(col)+cardsAttr.w*(factor),y:offset.y+cardsAttr.padding*(row+1)+cardsAttr.h*(row),obj:null,card:null}
+				);
 			}
+		}
 	}
 	,newGame: function(){
+		console.log(this.player);
 		var that = this;
 		var playercount = 0;
-
+			//setting up the player cardslots
 		$.each(this.playerCardslotsPos,function(direction,position){
 			var playerCardslots = {};
 			for(var i=0;i<=position.length-1;i++){
@@ -84,73 +85,81 @@ Crafty.c('table',{
 			that.player[playercount].cardslots = playerCardslots;
 			playercount++;
 		});
-
-		$.each(this.player,function(key,player){
-			var playerHp = 100;
-			player.obj
-				.player(
-					key,
-					playerHp,
-					// that.shuffle(that.cards),
-					that,
-					that.directions[key],
-					that.player[key].cardslots
-				);
-				// .drawCards();
+			//init player
+		this.initPlayer(function(){
+				//start new round
+			that.round = 0;
+			that.newRound();
 		});
-		this.round = 0;
-		this.newRound();
+	}
+	,initPlayer: function(callback){
+		var that = this;
+		$.each(this.player,function(key,player){
+				//create the player obj
+			player
+				.player(
+					key,							//player "id"
+					that,							//link to table
+					that.player[key].cardslots 		//playercardslots (4)
+				);
+				//setting the attr for the player obj
+			player.life(120);
+			player.weapon(5);				//todo: make this variable
+			player.shield(20);
+		});
+		callback();
 	}
 	,newRound: function(){
 		var that = this;
+
 		this.shuffle(this.cards);
 
-		if(this.round != 0)
+		if(this.round != 0)									//first round no cards need to be cleard
 		{
 			this.clearCards();
 		}
-		this.giveCards();
+
+		this.giveCards();									//give cards and remove them from the cards the players get --> no doubles on both sides
+
 		$.each(this.player,function(key,player){
-			player.obj.resetStackcards();
-			player.obj.setCards(that.shuffle(that.cards));
-			player.obj.drawCards();
+			player.resetStackcards();						//remove all cards
+			player.setCards(that.shuffle(that.cards));		//give new cards (without the this.giveCards()) to the players stack
+			player.drawCards();								//draw cards to fill the player cardslots from separate carddecks per player
 		});
 
-		if(this.turn.player == null)	//first round
+		if(this.turn.player == null)						//is first round
 		{
-			this.turn.player = this.player[0].obj.id;	//randomize!!!!
-			this.player[this.turn.player].obj.isTurn();
+			this.turn.player = this.player[0].id;			//todo: randomize!!!!
+			this.player[this.turn.player].isTurn();
 		}
 		else
 		{
-			this.player[this.turn.player].obj.turnOver();
-			this.turn.player = (this.turn.player == this.player[0].obj.id) ? this.player[1].obj.id : this.player[0].obj.id;
-			this.player[this.turn.player].obj.isTurn();
-			this.turn.move = 0;
+			this.changeTurn();								//change active player
 		}
-
-		$.each(this.fieldCardslots.rows,function(count,row){
-			$.each(row,function(col,slot){
-				if(slot.card == null && slot.obj != null){slot.obj.reset();}
-			});
-		});
 	}
 	,clearCards: function(){
-		$.each(Crafty("Card"),function(key,cardId){
+		$.each(Crafty("Card"),function(key,cardId){			//destroy Card and FieldCardslot elements for new Round
 			this.cards = this.allCards;
 			Crafty(cardId).destroy();
 		});
 		$.each(Crafty("FieldCardslot"),function(key,slot){
 			Crafty(slot).destroy();
 		});
-		this.fieldCardslots.clearCards();
+
+		$.each(this.fieldCardslots.rows,function(count,row){	//reset the battelfield card slots (enabled = true;taken = false;)
+			$.each(row,function(col,slot){
+				if(slot.card == null && slot.obj != null){slot.obj.reset();}
+			});
+		});
+
+		this.fieldCardslots.clearCards();					//delete old cards from all fieldslots
 	}
 	,giveCards: function(){
 		var that = this;
-			//playing cards
 		var fieldSlots = this.fieldCardslots.getSlots();
 		var cards = this.cards;
-		$.each(fieldSlots,function(key,row){
+
+		$.each(fieldSlots,function(key,row){				//set all fieldcardslots and set pos for fieldcardslots and cardslots
 			if(key == 1 || key == 2 || key ==3)
 			{
 
@@ -184,39 +193,36 @@ Crafty.c('table',{
 		});
 	}
 	,cardDropped: function(card,cardslot){
-
-		cardslot.setTaken();
-		this.fieldCardslots.rows[cardslot.row][cardslot.col].card = card;
+			//comes from the event from card element!!! Assures that card is dropped correct
+		cardslot.setTaken();														//block slot til next round
+		this.fieldCardslots.rows[cardslot.row][cardslot.col].card = card;			//set refrents to the dropped card in slot
 
 		if(this.turn.move < 1)
 		{
-			this.limitDropzones(cardslot,this.fieldCardslots);
+			this.limitDropzones(cardslot,this.fieldCardslots);						//set allowed dropps for second card
 			this.turn.move++;
 		}
 		else
 		{
 			var that = this;
-			this.checkForHits(cardslot,this.fieldCardslots,function(hits){
+			this.checkForHits(cardslot,this.fieldCardslots,function(hits){			//checking for hits
 				console.log(hits);
 				//------------> enable all slots with no card <----------------
-				if(that.moves < 7)
+				if(that.moves < 7)													//round over?
 				{
-					that.player[that.turn.player].obj.turnOver();
-					that.turn.player = (that.turn.player == that.player[0].obj.id) ? that.player[1].obj.id : that.player[0].obj.id;
-					that.player[that.turn.player].obj.isTurn();
-					that.turn.move = 0;
+					that.changeTurn();
 
-					$.each(that.fieldCardslots.rows,function(count,row){
+					$.each(that.fieldCardslots.rows,function(count,row){						//enable all fieldcardslots again
 						$.each(row,function(col,slot){
 							if(slot.card == null && slot.obj != null){slot.obj.enable();}
 						});
 					});
 					that.moves++;
 				}
-				else 					//round over
+				else 																//round over!
 				{
 					that.round++;
-					that.newRound();
+					that.newRound();												//start new round
 					that.moves = 0;
 				}
 			});
@@ -251,7 +257,7 @@ Crafty.c('table',{
 			{fieldcardslots.rows[0][0].obj.enable();}
 		}
 	}
-	,checkForHits: function(sourceCardslot,fieldcardslots,callback){
+	,checkForHits: function(sourceCardslot,fieldcardslots,callback){			//get affected rows and check them agains the rules
 		var row = sourceCardslot.row, col = sourceCardslot.col;
 		var affectedRows = [];
 		var rows = [];
@@ -294,6 +300,12 @@ Crafty.c('table',{
 		}
 		callback(this.rules.check(rows));
 	}
+	,changeTurn: function(){
+		this.player[this.turn.player].turnOver();
+		this.turn.player = (this.turn.player == this.player[0].id) ? this.player[1].id : this.player[0].id;
+		this.player[this.turn.player].isTurn();
+		this.turn.move = 0;
+	}
 	,shuffle: function(cards){
 		var currentIndex = cards.length
 	    , temporaryValue
@@ -310,5 +322,4 @@ Crafty.c('table',{
 		}
 		return cards;
 	}
-	,getPlayerCardslots: function(direction){return this.playerCardslotsPos[direction];}
 });

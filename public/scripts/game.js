@@ -4,7 +4,7 @@ Game = {
 		//var spritepath = "/public/gamefiles/sprites/";
 		var spritepath = "http://192.168.1.222/webroot_chris/test/"
 		var gamefilespath = "/public/gamefiles/";
-		loadComponents(['card','player','table','rules','fieldcardslot'],function(){
+		loadComponents(['card','player','table','rules','fieldcardslot','life','weapon','shield'],function(){
 			var cards = [];
 			Crafty.init(1000, 563);
 			//Crafty.canvas();

@@ -5,27 +5,21 @@ Crafty.c('player',{
 	cards: null,
 	stackcards: null,
 	acitvecards: null,
-	direction: null,
-	cardslots: null,
+	cardslots: [],
 
-	player: function(id,hp,table,direction,cardslots){
-		this.cardslots = [];
-		this.acitvecards = [];
+	player: function(id,table){
 		this.id = id;
-		this.hp = hp;
-		this.direction = direction;
 		this.table = table;
-		this.cardslots = cardslots;
 		return this;
 	}
 	,drawCards: function(){
 		var limit = Object.keys(this.cardslots).length;
 		for(var i=0;i<=limit-1;i++)
 		{
-			if(this.cardslots[i].hasCard == false)
+			if(this.cardslots[i].hasCard == false)				//each slot without card gets a card
 			{
 				var that = this;
-				var randnumber = Math.floor((Math.random()*this.stackcards.length));
+				var randnumber = Math.floor((Math.random()*this.stackcards.length));		//random card from stack
 				var newCard = Crafty.e("2D, DOM, Card, Draggable,"+this.stackcards[randnumber])
 								.Card(this.table)
 								.attr({
@@ -34,11 +28,11 @@ Crafty.c('player',{
 									value: this.stackcards[randnumber],
 									sourceCardslot: i
 								})
-								.bind("StartDrag",function(){
+								.bind("StartDrag",function(){							//event start drag
 									this.oldpos.x = this.x;
 									this.oldpos.y = this.y;
 								})
-								.bind("StopDrag", function(data) {
+								.bind("StopDrag", function(data) {						//event stop drag
 									var card = this;
 									this.dropped(function(chosencardslot){
 										if(chosencardslot != "undefined")	//correct drop
@@ -63,7 +57,6 @@ Crafty.c('player',{
 		});
 	}
 	,setCards: function(cards){
-		//this.cards = cards;
 		this.stackcards = cards;
 	}
 	,setPlayerCardslots: function(playerCardslots){
@@ -79,8 +72,5 @@ Crafty.c('player',{
 		$.each(this.acitvecards,function(key,card){
 			card.disableDrag();
 		});
-	}
-	,getHp: function(){
-		console.log(this.hp);
 	}
 });
