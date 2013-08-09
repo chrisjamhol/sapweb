@@ -4,7 +4,9 @@ Game = {
 		//var spritepath = "/public/gamefiles/sprites/";
 		var spritepath = "http://192.168.1.222/webroot_chris/test/"
 		var gamefilespath = "/public/gamefiles/";
-		loadComponents(['card','player','table','rules','fieldcardslot','life','weapon','shield'],function(){
+		loadComponents(['card','player','table','rules','fieldcardslot','life','weaponComp','shield'
+							,'weapons/w_stick'
+							,'weapons/w_mightyhammer'],function(){
 			var cards = [];
 			Crafty.init(1000, 563);
 			//Crafty.canvas();
@@ -28,7 +30,7 @@ Game = {
 				var pos4 = [3,i-2];
 
 				if(i == 2)			//2's cards
-				{cardspos["c"+2] = [0,0];cardspos["d"+2] = [1,0];cardspos["h"+2] = [2,0];cardspos["s"+2] = [3,0];}
+					{cardspos["c"+2] = [0,0];cardspos["d"+2] = [1,0];cardspos["h"+2] = [2,0];cardspos["s"+2] = [3,0];}
 				else if(i <= 10)	//numberd cards
 					{cardspos["c"+i] = pos1;cardspos["d"+i] = pos2;cardspos["h"+i] = pos3;cardspos["s"+i] = pos4;}
 				else if(i == 11)	//aces
@@ -50,6 +52,13 @@ Game = {
 			//save all avalible cards in cards[]
 			$.each(cardspos,function(key,pos){cards.push(key);});
 			//end load cards
+
+			//load player sprites
+			Crafty.sprite(98,120,spritepath+"characters/monsters.png",
+				{
+					"playerchar0": [0,0],
+					"playerchar1": [1,0]
+				},0);
 
 			//other sprites
 			Crafty.sprite(70,83,gamefilespath+'images/cardslot.png',{'Cardslot':[0,0]},0);

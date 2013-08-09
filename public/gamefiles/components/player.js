@@ -1,15 +1,16 @@
 Crafty.c('player',{
 	id: null,
+	character: null,
 	table: null,
-	hp: null,
 	cards: null,
 	stackcards: null,
 	acitvecards: null,
 	cardslots: [],
 
-	player: function(id,table){
+	player: function(id,table,charpos){
 		this.id = id;
 		this.table = table;
+		this.drawChar(charpos);
 		return this;
 	}
 	,drawCards: function(){
@@ -72,5 +73,10 @@ Crafty.c('player',{
 		$.each(this.acitvecards,function(key,card){
 			card.disableDrag();
 		});
+	}
+	,drawChar: function(charpos){
+		console.log(this.id);
+		console.log(charpos);
+		this.character = Crafty.e('2D,DOM,playerchar'+this.id).attr({x: charpos[0], y: charpos[1]});
 	}
 });

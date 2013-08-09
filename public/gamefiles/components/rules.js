@@ -1,18 +1,5 @@
 Crafty.c('Rules',{
-	hands: null,
-	init: function(){
-		this.hands = {
-			straightflush: this.straightflush,
-			fourofakind: this.fourofakind,
-			fullhouse: this.fullhouse,
-			flush: this.flush,
-			staight: this.staight,
-			threeofakind: this.threeofakind,
-			twopair: this.twopair,
-			onepair: this.onepair
-		}
-	}
-	,check: function(rows){
+	check: function(rows){
 		var hits = [];
 		var that = this;
 		$.each(rows,function(key,row){
@@ -64,6 +51,7 @@ Crafty.c('Rules',{
 					{
 						result.rank = 4;
 						result.name = "Staight";
+						result.label = "staight";
 					}
 					else	//check jocker
 					{
@@ -71,6 +59,7 @@ Crafty.c('Rules',{
 						{
 							result.rank = 1;
 							result.name = "One Pair";
+							result.label = "onepair";
 						}
 					}
 					break;
@@ -81,11 +70,13 @@ Crafty.c('Rules',{
 					{
 						result.rank = 3;
 						result.name = "Three of a Kind";
+						result.label = "threeofakind";
 					}
 					else
 					{
 						result.rank = 1;
 						result.name = "One Pair";
+						result.label = "onepair";
 					}
 					break;
 
@@ -99,11 +90,13 @@ Crafty.c('Rules',{
 						{
 							result.rank = 7;
 							result.name = "Four of a kind";
+							result.label = "fourofakind";
 						}
 						else
 						{
 							result.rank = 3;
 							result.name = "Three of a kind";
+							result.label = "threeofakind";
 						}
 					}
 					else if(occ.high.count == 2) //two pair
@@ -112,11 +105,13 @@ Crafty.c('Rules',{
 						{
 							result.rank = 6;
 							result.name = "Full House";
+							result.label = "fullhouse";
 						}
 						else
 						{
 							result.rank = 2;
 							result.name = "Two Pair";
+							result.label = "twopair";
 						}
 					}
 					break;
@@ -131,17 +126,20 @@ Crafty.c('Rules',{
 						{
 							result.rank = 7;
 							result.name= "Four of a Kind";
+							result.label = "fourofakind";
 						}
 						else
 						{
 							result.rank = 9;
 							result.name = "Five of a Kind";
+							result.label = "fiveofakind";
 						}
 					}
 					else if(occ.high.count == 3)
 					{
 						result.rank = 6;
 						result.name= "Full House";
+						result.label = "fullhouse";
 					}
 					break;
 			}
@@ -153,11 +151,13 @@ Crafty.c('Rules',{
 				{
 					result.rank = 8;
 					result.name = "Staight Flush";
+					result.label = "straightflush";
 				}
 				else if(result.rank < 5)	//flush
 				{
 					result.rank = 5;
 					result.name = "Flush";
+					result.label = "flush";
 				}
 			}
 
@@ -210,46 +210,4 @@ Crafty.c('Rules',{
 		}
 		return occ;
 	}
-
-
-	// ,straightflush: function(){
-	// 	var rank = 8;
-	// 	var result = {hit:true};
-	// 	return result;
-	// },
-	// fourofakind: function(){
-	// 	var rank = 7;
-	// 	var result = {hit:false};
-	// 	return result;
-	// },
-	// fullhouse: function(){
-	// 	var rank = 6;
-	// 	var result = {hit:false};
-	// 	return result;
-	// },
-	// flush: function(){
-	// 	var rank = 5;
-	// 	var result = {hit:false};
-	// 	return result;
-	// },
-	// staight: function(){
-	// 	var rank = 4;
-	// 	var result = {hit:false};
-	// 	return result;
-	// },
-	// threeofakind: function(){
-	// 	var rank = 3;
-	// 	var result = {hit:false};
-	// 	return result;
-	// },
-	// twopair: function(){
-	// 	var rank = 2;
-	// 	var result = {hit:false};
-	// 	return result;
-	// },
-	// onepair: function(){
-	// 	var rank = 1;
-	// 	var result = {hit:false};
-	// 	return result;
-	// }
 });

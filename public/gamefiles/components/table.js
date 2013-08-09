@@ -17,14 +17,18 @@ Crafty.c('table',{
 					top:[[560,25],[660,25],[760,25],[860,25]],
 					bottom:[[560,440],[660,440],[760,440],[860,440]]
 				  },
-	table: function(cards,playercount){
+	playerCharPos: {
+					0: [830,135],
+					1: [830,310]
+				}
+	,table: function(cards,playercount){
 		this.cards = cards;
 		this.allCards = cards;
 		this.playercount = playercount;
 		//create player
 		for(var i=0;i<=this.playercount-1;i++)
 		{
-			this.player[i] = Crafty.e("2D, DOM, player,life,weapon,shield").life(120);
+			this.player[i] = Crafty.e("2D, DOM, player,life,weaponComp,shield").life(120);
 		}
 		this.rules = Crafty.e("Rules");
 		return this;
@@ -71,7 +75,6 @@ Crafty.c('table',{
 		}
 	}
 	,newGame: function(){
-		console.log(this.player);
 		var that = this;
 		var playercount = 0;
 			//setting up the player cardslots
@@ -100,11 +103,12 @@ Crafty.c('table',{
 				.player(
 					key,							//player "id"
 					that,							//link to table
-					that.player[key].cardslots 		//playercardslots (4)
+					//that.player[key].cardslots,		//playercardslots (4)
+					that.playerCharPos[key]			//position for the avatar
 				);
 				//setting the attr for the player obj
 			player.life(120);
-			player.weapon(5);				//todo: make this variable
+			player.weaponComp(20,"w_mightyhammer");				//todo: make this variable
 			player.shield(20);
 		});
 		callback();
@@ -207,6 +211,26 @@ Crafty.c('table',{
 			var that = this;
 			this.checkForHits(cardslot,this.fieldCardslots,function(hits){			//checking for hits
 				console.log(hits);
+				console.log(that.turn);
+				if(hits.length > 0)															//if damage -> deal damage
+				{
+					$.each(hits,function(hitcount,hit){
+						var weaponDamage = 0;
+						if(that.turn.player == 0)				//player 0 attaks
+						{
+							weaponDamage = that.player[0].attack(hit.label);
+							victim = 1;
+						}
+						else if(that.turn.player == 1)			//player 1 attaks
+						{
+							weaponDamage = that.player[1].attack(hit.label);
+							victim = 0;
+						}
+						that.player[victim].takeDamage(weaponDamage);
+						console.log(that.player[victim].hp);
+					});
+				}
+
 				//------------> enable all slots with no card <----------------
 				if(that.moves < 7)													//round over?
 				{
