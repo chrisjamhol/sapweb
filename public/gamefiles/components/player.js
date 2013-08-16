@@ -6,11 +6,13 @@ Crafty.c('player',{
 	stackcards: null,
 	acitvecards: null,
 	cardslots: [],
+	healthDisplay: null,
 
-	player: function(id,table,charpos){
+	player: function(id,table,charpos,healthPos){
 		this.id = id;
 		this.table = table;
 		this.drawChar(charpos);
+		this.drawHealth(healthPos);
 		return this;
 	}
 	,drawCards: function(){
@@ -46,9 +48,8 @@ Crafty.c('player',{
 				this.cardslots[i]['hasCard'] = true;
 				this.stackcards.splice(randnumber,1);
 			}
-			else
-			{i++;}
 		}
+		return this;
 	}
 	,resetStackcards: function(){
 		this.stackcards = {};
@@ -56,27 +57,47 @@ Crafty.c('player',{
 		$.each(this.cardslots,function(key,cardslot){
 			cardslot.hasCard = false;
 		});
+		return this;
 	}
 	,setCards: function(cards){
 		this.stackcards = cards;
+		return this;
 	}
 	,setPlayerCardslots: function(playerCardslots){
 		this.playerCardslots = playerCardslots;
+		return this;
 	}
 	,isTurn: function(){
 		this.drawCards();
 		$.each(this.acitvecards,function(key,card){
 			card.enableDrag();
 		});
+		return this;
 	}
 	,turnOver: function(){
 		$.each(this.acitvecards,function(key,card){
 			card.disableDrag();
 		});
+		return this;
 	}
 	,drawChar: function(charpos){
-		console.log(this.id);
-		console.log(charpos);
 		this.character = Crafty.e('2D,DOM,playerchar'+this.id).attr({x: charpos[0], y: charpos[1]});
+		return this;
+	}
+	,drawHealth: function(healthPos){
+		this.healthDisplay = Crafty.e('2D,DOM,Text,hpDisplay')
+								.attr({x: healthPos[0], y: healthPos[1]})
+								.textFont({
+									family: 'PipeDream',
+									size: '35px',
+									weight: 'bold'
+								})
+								.textColor('#d83f46', 1)
+								.text(this.hp);
+		return this;
+	}
+	,updateHealthDisplay: function(){
+		this.healthDisplay.text(this.hp);
+		return this;
 	}
 });

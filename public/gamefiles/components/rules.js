@@ -147,7 +147,7 @@ Crafty.c('Rules',{
 			//--- flush variants ----------------------------------------------------
 			if(Object.keys(occ.suits).length == 1)
 			{
-				if(result.rank == 4)		//straight flush
+				if(result.rank == 4)		//staight flush
 				{
 					result.rank = 8;
 					result.name = "Staight Flush";
@@ -163,6 +163,9 @@ Crafty.c('Rules',{
 
 			if(result.rank != null){hits.push(result);}
 		});
+		// hits = [{"rank":8,"name":"Staight Flush","label":"straightflush"},
+		// 		{"rank":1,"name":"One Pair","label":"onepair"},
+		// 		{"rank":4,"name":"Staight","label":"staight"}];
 		return hits;
 	}
 	,countOccurrences: function(row){

@@ -9,6 +9,7 @@ var __publicPaths = {
     publicSocketPath : path.join(__dirname, '../' , 'public/scripts/websockets/'),
     publicImagePath : path.join(__dirname, '../' , 'public/images/'),
     publicLibaryPath: path.join(__dirname, '../' , 'public/libary/'),
+    publicFontPath: path.join(__dirname, '../' , 'public/fonts/'),
     publicGamefilesPath: path.join(__dirname, '../' , 'public/gamefiles/'),
     publicComponentsPath: path.join(__dirname, '../' , 'public/scripts/gamefiles/components/')
 }
@@ -44,6 +45,8 @@ app.get('/public/styles/:styleName',function(req,res){res.sendfile(__publicPaths
 app.get('/public/sockets/:socketName',function(req,res){res.sendfile(__publicPaths.publicSocketPath+req.params['socketName']);});
 app.get('/public/images/:imageName',function(req,res){console.log(req.params['imageName']);res.sendfile(__publicPaths.publicImagePath+req.params['imageName']);});
 app.get('/public/libary/*',function(req,res){res.sendfile(__publicPaths.publicLibaryPath+req.params[0]);});
+app.get('/public/fonts/*',function(req,res){res.sendfile(__publicPaths.publicFontPath+req.params[0]);});
+
 
 //piping gamefiles
 app.get('/public/components/*',function(req,res){res.sendfile(__publicPaths.publicComponentsPath+req.params[0]);});

@@ -2,6 +2,8 @@ Crafty.c('table',{
 	allCards: null,
 	cards: null,
 	fieldCardslots: null,
+	hitDescription: null,
+	hitDescriptionPos: {x: 560, y: 270},
 	player: [],
 	playercount: null,
 	directions: ['top','bottom'],
@@ -20,6 +22,10 @@ Crafty.c('table',{
 	playerCharPos: {
 					0: [830,135],
 					1: [830,310]
+				},
+	playerHealthPos: {
+					0: [715,150],
+					1: [715,375]
 				}
 	,table: function(cards,playercount){
 		this.cards = cards;
@@ -73,6 +79,16 @@ Crafty.c('table',{
 				);
 			}
 		}
+
+			//creating the hitDescription obj
+		this.hitDescription = Crafty.e('2D,DOM,Text,Tween,hitDescription')
+								.attr({x: this.hitDescriptionPos.x, y: this.hitDescriptionPos.y})
+								.textFont({
+									family: 'PipeDream',
+									size: '35px',
+									weight: 'bold'
+								})
+								.textColor('#d83f46', 1);
 	}
 	,newGame: function(){
 		var that = this;
@@ -103,12 +119,12 @@ Crafty.c('table',{
 				.player(
 					key,							//player "id"
 					that,							//link to table
-					//that.player[key].cardslots,		//playercardslots (4)
-					that.playerCharPos[key]			//position for the avatar
+					that.playerCharPos[key],		//position for the avatar
+					that.playerHealthPos[key]
 				);
 				//setting the attr for the player obj
 			player.life(120);
-			player.weaponComp(20,"w_mightyhammer");				//todo: make this variable
+			player.weaponComp(20,"w_stick");				//todo: make this variable
 			player.shield(20);
 		});
 		callback();
@@ -209,45 +225,24 @@ Crafty.c('table',{
 		else
 		{
 			var that = this;
-			this.checkForHits(cardslot,this.fieldCardslots,function(hits){			//checking for hits
-				console.log(hits);
-				console.log(that.turn);
+			this.checkForHits(cardslot,this.fieldCardslots,function handleHits(hits){			//checking for hits
 				if(hits.length > 0)															//if damage -> deal damage
 				{
-					$.each(hits,function(hitcount,hit){
-						var weaponDamage = 0;
-						if(that.turn.player == 0)				//player 0 attaks
+					that.dealDamage(hits,function(){
+						if(that.player[victim].hp <= 0)
 						{
-							weaponDamage = that.player[0].attack(hit.label);
-							victim = 1;
+							Crafty.winner = (that.player[victim].id == 1) ? 0 : 1;
+							Crafty.scene("won");
 						}
-						else if(that.turn.player == 1)			//player 1 attaks
+						else
 						{
-							weaponDamage = that.player[1].attack(hit.label);
-							victim = 0;
+							that.handleTurnEnd();
 						}
-						that.player[victim].takeDamage(weaponDamage);
-						console.log(that.player[victim].hp);
 					});
 				}
-
-				//------------> enable all slots with no card <----------------
-				if(that.moves < 7)													//round over?
+				else
 				{
-					that.changeTurn();
-
-					$.each(that.fieldCardslots.rows,function(count,row){						//enable all fieldcardslots again
-						$.each(row,function(col,slot){
-							if(slot.card == null && slot.obj != null){slot.obj.enable();}
-						});
-					});
-					that.moves++;
-				}
-				else 																//round over!
-				{
-					that.round++;
-					that.newRound();												//start new round
-					that.moves = 0;
+					that.handleTurnEnd();
 				}
 			});
 		}
@@ -285,50 +280,156 @@ Crafty.c('table',{
 		var row = sourceCardslot.row, col = sourceCardslot.col;
 		var affectedRows = [];
 		var rows = [];
-			//corners
-		if( (row == 0 && col == 0) || (row == 4 && col == 4) )	//top left to bottom right
-		{
-			var rowObj = [];
-			var colcount = 0;
-			for(var i = 0; i <= 4; i++)
-			{
-				rowObj.push(fieldcardslots.rows[i][colcount]);
-				colcount++;
-			}
-			rows.push(rowObj);
-		}
-		if( (row == 4 && col == 0) || (row == 0 && col == 4))	//top right to bottom left
-		{
-			var rowObj = [];
-			var colcount = 4;
-			for(var i = 0; i <= 4; i++)
-			{
-				rowObj.push(fieldcardslots.rows[i][colcount]);
-				colcount--;
-			}
-			rows.push(rowObj);
-		}
+
 			//horizontal
 		if((row > 0 && row < 4) && (col == 0 || col == 4))
 		{
+				//push affected row
 			rows.push(fieldcardslots.rows[row]);
+				//get adjacent cols
+			var colcardCount = this.getAdjacentColCardCount(fieldcardslots);
+			if(colcardCount.left == 5) {rows.push(this.getColCards(fieldcardslots,0));} 	//left col is filled with 5 cards
+			if(colcardCount.right == 5){rows.push(this.getColCards(fieldcardslots,4));} 	//right col is filled with 5 cards
 		}
 			//vertical
 		if((col > 0 && col < 4) && (row == 0 || row == 4))
 		{
-			var rowObj = [];
-			for(var i = 4; i >= 0; i--) {
-				rowObj.push(fieldcardslots.rows[i][col]);
-			};
-			rows.push(rowObj);
+				//get main col
+			rows.push(this.getColCards(fieldcardslots,col));
+				//get adjasend rows
+			var rowcardCount = this.getAdjacentRowCardCount(fieldcardslots);
+			if(rowcardCount.top == 5) {rows.push(fieldcardslots.rows[0]);} 					//top row is filled with 5 cards
+			if(rowcardCount.bottom == 5){rows.push(fieldcardslots.rows[4]);} 				//bottom row is filled with 5 cards
+		}
+			//corners
+		if( (row == 0 && col == 0) || (row == 4 && col == 4) )	//top left to bottom right
+		{
+				//diagonal
+			rows.push(this.getDiagonalCards(fieldcardslots,"lr"));		//lr -> left to right
+				//adjasend col and row
+			var colcardCount = this.getAdjacentColCardCount(fieldcardslots);
+			var rowcardCount = this.getAdjacentRowCardCount(fieldcardslots);
+				if(colcardCount.left == 5){rows.push(this.getColCards(fieldcardslots,0));}
+				if(rowcardCount.top == 5){rows.push(fieldcardslots.rows[0]);}
+				if(colcardCount.right == 5){rows.push(this.getColCards(fieldcardslots,4));}
+				if(rowcardCount.bottom == 5){rows.push(fieldcardslots.rows[4]);}
+		}
+
+		if( (row == 4 && col == 0) || (row == 0 && col == 4))	//top right to bottom left
+		{
+				//diagonal
+			rows.push(this.getDiagonalCards(fieldcardslots,"rl"));		//rl -> left to right
+				//adjasend col and row
+			var colcardCount = this.getAdjacentColCardCount(fieldcardslots);
+			var rowcardCount = this.getAdjacentRowCardCount(fieldcardslots);
+				if(colcardCount.left == 5){rows.push(this.getColCards(fieldcardslots,4));}
+				if(rowcardCount.top == 5){rows.push(fieldcardslots.rows[0]);}
+				if(colcardCount.right == 5){rows.push(this.getColCards(fieldcardslots,0));}
+				if(rowcardCount.bottom == 5){rows.push(fieldcardslots.rows[4]);}
 		}
 		callback(this.rules.check(rows));
+	}
+	,dealDamage: function(hits,callback){
+		var that = this;
+		var weaponDamage = 0;
+		var hits = hits;
+		var hit = hits[0];
+		if(this.turn.player == 0)				//player 0 attaks
+		{
+			weaponDamage = this.player[0].attack(hit.label);
+			victim = 1;
+		}
+		else if(this.turn.player == 1)			//player 1 attaks
+		{
+			weaponDamage = this.player[1].attack(hit.label);
+			victim = 0;
+		}
+		var hitname = hit.name;
+		this.displayDamage(hitname,function serveDamage(){
+			that.player[victim].takeDamage(weaponDamage).updateHealthDisplay();
+			hits.shift();
+			if(hits[0] != null)
+			{
+				that.dealDamage(hits,callback);
+			}
+			else
+			{
+				callback();
+			}
+		});
+
+	}
+	,displayDamage: function(hitDescription,callback){
+			//updateing the hitDescription Lable
+		this.hitDescription.text(hitDescription);
+		var hitDescriptionDomId = Crafty('hitDescription');
+		var hitDescriptionDomObject = $('#ent'+hitDescriptionDomId[0]);
+		$(hitDescriptionDomObject[0]).show();
+		$(hitDescriptionDomObject[0]).fadeOut(2000,function(){
+			callback();
+		});
+	}
+	,handleTurnEnd: function(){
+		if(this.moves < 7)
+			{this.initNewTurn();}
+		else
+			{this.roundOver();}
 	}
 	,changeTurn: function(){
 		this.player[this.turn.player].turnOver();
 		this.turn.player = (this.turn.player == this.player[0].id) ? this.player[1].id : this.player[0].id;
 		this.player[this.turn.player].isTurn();
 		this.turn.move = 0;
+	}
+	,initNewTurn: function(){
+		this.changeTurn();
+		$.each(this.fieldCardslots.rows,function(count,row){						//enable all fieldcardslots again
+			$.each(row,function(col,slot){
+				if(slot.card == null && slot.obj != null){slot.obj.enable();}
+			});
+		});
+		this.moves++;
+	}
+	,roundOver: function(){
+		this.round++;
+		this.newRound();
+		this.moves = 0;
+	}
+	,getAdjacentColCardCount: function(fieldcardslots){
+		var cardcountL = 0;
+		var cardcountR = 0;
+		$.each(fieldcardslots.rows,function(rowcount,row){
+			if(row[0].card != null){cardcountL++;}
+			if(row[4].card != null){cardcountR++;}
+		});
+		return {"left": cardcountL, "right": cardcountR};
+	}
+	,getAdjacentRowCardCount: function(fieldcardslots){
+		var cardCount = [];
+		$.each([fieldcardslots.rows[0],fieldcardslots.rows[4]],function(rowindex,row){
+			cardCount[rowindex] = 0;
+			for(var i = 0; i <= 4; i++)
+			{
+				if(row[i].card != null){cardCount[rowindex]++;}
+			}
+		});
+		return {"top": cardCount[0], "bottom": cardCount[1]};
+	}
+	,getColCards: function(fieldcardslots,col){
+		var colCards = [];
+		for(var i = 0; i <= 4; i++){colCards.push(fieldcardslots.rows[i][col]);}
+		return colCards;
+	}
+	,getDiagonalCards: function(fieldcardslots,direction){
+		var rowObj = [];
+		var colcount = (direction == "lr") ? 0 : 4;
+		for(var i = 0; i <= 4; i++)
+		{
+			rowObj.push(fieldcardslots.rows[i][colcount]);
+			//colcount++;
+			colcount = (direction == "lr") ? (colcount+1) : (colcount-1);
+		}
+		return rowObj;
 	}
 	,shuffle: function(cards){
 		var currentIndex = cards.length

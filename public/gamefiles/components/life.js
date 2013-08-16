@@ -4,7 +4,7 @@ Crafty.c('life',{
 		this.hp = hp;
 		return this;
 	}
-	,heal: function(points){this.hp += points;}
-	,takeDamage: function(points){this.hp -= points;}
+	,heal: function(points){this.hp += points;return this;}
+	,takeDamage: function(points){this.hp -= points;return this;}
 	,getHp: function(){return this.hp;}
 });

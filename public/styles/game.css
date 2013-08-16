@@ -1,0 +1,13 @@
+.hpDisplay{
+	-webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: black;
+	-moz-text-stroke-width: 1px;
+	-moz-text-stroke-color: black;
+}
+.hitDescription{
+	width: 600px !important;
+	-webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: black;
+	-moz-text-stroke-width: 1px;
+	-moz-text-stroke-color: black;
+}

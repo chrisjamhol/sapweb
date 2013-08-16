@@ -1,6 +1,7 @@
 Game = {
 	start: function()
 	{
+		Crafty.winner = null;
 		//var spritepath = "/public/gamefiles/sprites/";
 		var spritepath = "http://192.168.1.222/webroot_chris/test/"
 		var gamefilespath = "/public/gamefiles/";
@@ -75,7 +76,7 @@ Game = {
 					//console.log(e);
 				});
 			});
-			Crafty.scene("loading");
+
 
 			Crafty.scene("main", function() {
 				Crafty.e("2D,DOM,Image").image(gamefilespath+'background/background1.png').attr({z:-1});
@@ -83,6 +84,45 @@ Game = {
 				var table = Crafty.e("2D,DOM,table").table(cards,playercount);
 				table.newGame();
 			});
+
+			Crafty.scene("won",function(){
+				Crafty.background('#000000');
+				Crafty.e("2D,DOM,Text,winner")
+								.attr({
+									x: 422,
+									y: 200
+								})
+								.textFont({
+									family: 'PipeDream',
+									size: '35px',
+									weight: 'bold'
+								})
+								.textColor('#FFFFFF',1)
+								.text("winner: <br />Player "+Crafty.winner);
+
+				var replayButton = Crafty.e("2D, DOM, Image, Mouse")
+									.image(gamefilespath+'images/replayButton.png')
+									.attr({x:347,y:300})
+									.bind('MouseUp',function(){
+										Crafty.scene("main");
+									});
+
+				Crafty.e("2D,DOM,Text,winner")
+								.attr({
+									x: 452,
+									y: 308
+								})
+								.textFont({
+									family: 'PipeDream',
+									size: '30px',
+									weight: 'bold'
+								})
+								.textColor('#000000',1)
+								.text("replay");
+				console.log(Crafty.winner);
+			});
+
+			Crafty.scene("loading");
 		});
 
 		function loadComponents(components,callback){

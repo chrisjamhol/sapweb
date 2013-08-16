@@ -1,0 +1,7 @@
+@font-face {
+    font-family: "PipeDream";
+    src: url(/public/fonts/PipeDream.ttf) format("truetype");
+}
+.winner{
+	width: 156px !important;
+}
