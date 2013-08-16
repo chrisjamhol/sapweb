@@ -54,3 +54,4 @@ app.get('/public/gamefiles/*',function(req,res){
     //console.log(req.params[0]);
     res.sendfile(__publicPaths.publicGamefilesPath+req.params[0]);
 });
+
