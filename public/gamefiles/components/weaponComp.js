@@ -1,8 +1,6 @@
 Crafty.c('weaponComp',{
-	attk: null,
 	weapon: null,
-	weaponComp: function(attk,name){
-		this.attk = attk;
+	weaponComp: function(name){
 		this.weapon = Crafty.e(name);
 		return this;
 	}

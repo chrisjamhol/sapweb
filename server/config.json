@@ -2,5 +2,32 @@
 	"server": {
 				"port": "80",
 				"host": "127.0.0.1"
-			}
+			},
+	"publicPaths":
+			{
+				"views": "public/views/",
+				"scripts": "public/scripts/",
+				"styles": "public/styles/",
+				"sockets": "public/scripts/websockets/",
+				"images": "public/images/",
+				"libaries": "public/libary/",
+				"fonts": "public/fonts/",
+				"gamefiles": "public/gamefiles/",
+				"components": "public/scripts/gamefiles/components/"
+			},
+	"cards": [
+			"c2", "d2", "h2", "s2",
+			"c3", "d3", "h3", "s3",
+			"c4", "d4", "h4", "s4",
+			"c5", "d5", "h5", "s5",
+			"c6", "d6", "h6", "s6",
+			"c7", "d7", "h7", "s7",
+			"c8", "d8", "h8", "s8",
+			"c9", "d9", "h9", "s9",
+			"c10", "d10", "h10", "s10",
+			"c14", "d14", "h14", "s14",
+			"c11", "d11", "h11", "s11",
+			"c13", "d13", "h13", "s13",
+			"c12", "d12", "h12", "s12"
+			]
 }

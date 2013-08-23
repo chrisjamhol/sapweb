@@ -1,11 +1,13 @@
 Crafty.c('table',{
+	tabledata: null,
+	socket: null,
 	allCards: null,
 	cards: null,
 	fieldCardslots: null,
 	hitDescription: null,
 	hitDescriptionPos: {x: 560, y: 270},
-	player: [],
-	playercount: null,
+	player: null,
+	opponent: null,
 	directions: ['top','bottom'],
 	rules: null,
 	turn: {
@@ -16,30 +18,30 @@ Crafty.c('table',{
 	moves: 0,
 	playerCardslots: {},
 	playerCardslotsPos: {
-					top:[[560,25],[660,25],[760,25],[860,25]],
-					bottom:[[560,440],[660,440],[760,440],[860,440]]
+					1:[[560,25],[660,25],[760,25],[860,25]],
+					2:[[560,440],[660,440],[760,440],[860,440]]
 				  },
 	playerCharPos: {
-					0: [830,135],
-					1: [830,310]
+					1: [830,135],		//player 1
+					2: [830,310]		//player 2
 				},
 	playerHealthPos: {
-					0: [715,150],
-					1: [715,375]
+					1: [715,150],		//player 1
+					2: [715,375]		//player 2
 				}
-	,table: function(cards,playercount){
+	,table: function(cards,data,socket){
 		this.cards = cards;
 		this.allCards = cards;
-		this.playercount = playercount;
+		this.tabledata = data;
+		this.socket = socket;
 		//create player
-		for(var i=0;i<=this.playercount-1;i++)
-		{
-			this.player[i] = Crafty.e("2D, DOM, player,life,weaponComp,shield").life(120);
-		}
+		this.player = Crafty.e("2D, DOM, player, life, weaponComp, shield");
+		this.opponent = Crafty.e("2D, DOM, opponent");
 		this.rules = Crafty.e("Rules");
+		this.initSockets(socket);
 		return this;
 	},
-	init: function(playercount){
+	init: function(){
 			//init battelfield -> this.fieldCardslots (obj)
 		this.fieldCardslots = {
 			getSlots: function(){return this.rows;},
@@ -79,7 +81,6 @@ Crafty.c('table',{
 				);
 			}
 		}
-
 			//creating the hitDescription obj
 		this.hitDescription = Crafty.e('2D,DOM,Text,Tween,hitDescription')
 								.attr({x: this.hitDescriptionPos.x, y: this.hitDescriptionPos.y})
@@ -90,83 +91,104 @@ Crafty.c('table',{
 								})
 								.textColor('#d83f46', 1);
 	}
-	,newGame: function(){
+	,initSockets: function(){
 		var that = this;
-		var playercount = 0;
+		this.socket.on("reciveOpponentCards",function onReciveOpponentCards(opponentCards){
+			that.setOpponentCards(opponentCards)
+		});
+		this.socket.on("sendPlayerCards",function onSendPlayerCards(){
+			console.log("onSendPlayerCards");
+			that.sendPlayerCards();
+		});
+	}
+		//helper to send via socket
+	,socketSend: function(statement,data){
+		if(data){this.socket.emit(statement,data);}else{this.socket.emit(statement);}
+	}
+	,newGame: function(playerdata,opponentdata,firstTurn){
+		var that = this;
 			//setting up the player cardslots
-		$.each(this.playerCardslotsPos,function(direction,position){
+		$.each(this.playerCardslotsPos,function settingUpCardslots(playerkey,position){
 			var playerCardslots = {};
 			for(var i=0;i<=position.length-1;i++){
 				playerCardslots[i] = Crafty.e("2D,DOM,Cardslot").attr({x:position[i][0], y:position[i][1], hasCard: false});
 			}
-			that.playerCardslots[direction] = [];
-			that.playerCardslots[direction].push(playerCardslots);
-			that.player[playercount].cardslots = playerCardslots;
-			playercount++;
+			that.playerCardslots[playerkey] = [];
+			that.playerCardslots[playerkey].push(playerCardslots);
+			if(playerkey == 1)
+				{that.player.cardslots = playerCardslots;}
+			else
+				{that.opponent.cardslots = playerCardslots;}
+
 		});
 			//init player
-		this.initPlayer(function(){
+		this.initPlayer(playerdata,opponentdata,function afterInitPlayer(){
 				//start new round
 			that.round = 0;
-			that.newRound();
+			that.newRound(firstTurn);
 		});
 	}
-	,initPlayer: function(callback){
+	,initPlayer: function(playerdata,opponentdata,callback){
 		var that = this;
-		$.each(this.player,function(key,player){
-				//create the player obj
-			player
-				.player(
-					key,							//player "id"
-					that,							//link to table
-					that.playerCharPos[key],		//position for the avatar
-					that.playerHealthPos[key]
-				);
-				//setting the attr for the player obj
-			player.life(120);
-			player.weaponComp(20,"w_stick");				//todo: make this variable
-			player.shield(20);
-		});
+		//create the player obj
+		var playerid = playerdata.id;
+		that.player
+			.player(
+				playerid,							//player "id" (=socketId)
+				that,								//link to table
+				that.playerCharPos[1],		//position for the avatar
+				that.playerHealthPos[1],
+				playerdata.avatar
+			);
+		//setting the attr for the player obj
+		that.player.life(playerdata.health);
+		that.player.weaponComp(playerdata.weapon);
+		that.player.shield(playerdata.shield);
+		that.player.updateHealthDisplay();
+
+		//create the opponent obj
+		that.opponent
+			.opponent(
+				opponentdata.id,
+				that.playerCharPos[2],
+				that.playerHealthPos[2],
+				opponentdata.avatar
+			);
+		that.opponent.updateHealthDisplay(opponentdata.health);
 		callback();
 	}
-	,newRound: function(){
-		var that = this;
-
-		this.shuffle(this.cards);
-
+	,newRound: function(firstTurn){
 		if(this.round != 0)									//first round no cards need to be cleard
-		{
-			this.clearCards();
-		}
+			{this.clearCards();}
 
-		this.giveCards();									//give cards and remove them from the cards the players get --> no doubles on both sides
+		this.player.resetStackcards();						//remove all cards
+		this.player.setCards(this.cards);		    			//give new cards (without the this.giveCards()) to the players stack
+		this.player.drawCards();
 
-		$.each(this.player,function(key,player){
-			player.resetStackcards();						//remove all cards
-			player.setCards(that.shuffle(that.cards));		//give new cards (without the this.giveCards()) to the players stack
-			player.drawCards();								//draw cards to fill the player cardslots from separate carddecks per player
-		});
+		console.log("socked send");
+		this.socketSend("getOpponentCards");
 
-		if(this.turn.player == null)						//is first round
-		{
-			this.turn.player = this.player[0].id;			//todo: randomize!!!!
-			this.player[this.turn.player].isTurn();
-		}
-		else
-		{
-			this.changeTurn();								//change active player
-		}
+		this.giveCards();
+		// if(this.turn.player == null)						//is first round
+		// {
+		// 	this.turn.player = this.player[0].id;			//todo: randomize!!!!
+		// 	this.player.isTurn();
+		// }
+		// else
+		// {
+		// 	this.changeTurn();								//change active player
+		// }
 	}
 	,clearCards: function(){
-		$.each(Crafty("Card"),function(key,cardId){			//destroy Card and FieldCardslot elements for new Round
+		$.each(Crafty("Card"),function destroyCard(key,cardId){			//destroy Card and FieldCardslot elements for new Round
 			this.cards = this.allCards;
 			Crafty(cardId).destroy();
 		});
-		$.each(Crafty("FieldCardslot"),function(key,slot){
+		$.each(Crafty("FieldCardslot"),function destroyFieldCardslot(key,slot){
 			Crafty(slot).destroy();
 		});
 
-		$.each(this.fieldCardslots.rows,function(count,row){	//reset the battelfield card slots (enabled = true;taken = false;)
+		$.each(this.fieldCardslots.rows,function resetRow(count,row){	//reset the battelfield card slots (enabled = true;taken = false;)
 			$.each(row,function(col,slot){
 				if(slot.card == null && slot.obj != null){slot.obj.reset();}
 			});
@@ -174,12 +196,22 @@ Crafty.c('table',{
 
 		this.fieldCardslots.clearCards();					//delete old cards from all fieldslots
 	}
+	,setOpponentCards: function(opponentCards){
+		console.log("recieved Cards");
+		console.log(opponentCards);
+		//this.socketSend("sendPlayerCards",this.sendPlayerCards());
+		this.opponent.setCards(opponentCards);
+	}
+	,sendPlayerCards: function(){
+		console.log("send Cards");
+		this.socketSend("sendPlayerCards",this.player.getHandCards());
+	}
 	,giveCards: function(){
 		var that = this;
 		var fieldSlots = this.fieldCardslots.getSlots();
 		var cards = this.cards;
-
-		$.each(fieldSlots,function(key,row){				//set all fieldcardslots and set pos for fieldcardslots and cardslots
+		var fieldcardCount = 0;
+		$.each(fieldSlots,function settingUpFieldCardslots(key,row){	//set all fieldcardslots and set pos for fieldcardslots and cardslots
 			if(key == 1 || key == 2 || key ==3)
 			{
 
@@ -187,15 +219,15 @@ Crafty.c('table',{
 				row[4].obj = Crafty.e("2D,DOM,FieldCardslot,Cardslot").FieldCardslot(key,4).attr({x:row[4].x, y:row[4].y});
 				for(var col=1;col<=3;col++)
 				{
-					var randnumber = Math.floor((Math.random()*cards.length));
-					var card = Crafty.e("2D, DOM, Card, "+cards[randnumber])
+					var card = Crafty.e("2D, DOM, Card, "+that.tabledata.fieldcards[fieldcardCount])
 								.attr({
 									x: row[col].x+5,
 									y: row[col].y+5,
-									value: cards[randnumber]
-								})
+									value:that.tabledata.fieldcards[fieldcardCount]
+								});
 					row[col].card = card;
-					cards.splice(randnumber,1);
+					cards.splice(cards[that.tabledata.fieldcards.indexOf(card.value)],1);
+					fieldcardCount++;
 				}
 			}
 			else
@@ -228,7 +260,7 @@ Crafty.c('table',{
 			this.checkForHits(cardslot,this.fieldCardslots,function handleHits(hits){			//checking for hits
 				if(hits.length > 0)															//if damage -> deal damage
 				{
-					that.dealDamage(hits,function(){
+					that.dealDamage(hits,function checksAfterDealingDamages(){
 						if(that.player[victim].hp <= 0)
 						{
 							Crafty.winner = (that.player[victim].id == 1) ? 0 : 1;
@@ -383,7 +415,7 @@ Crafty.c('table',{
 	}
 	,initNewTurn: function(){
 		this.changeTurn();
-		$.each(this.fieldCardslots.rows,function(count,row){						//enable all fieldcardslots again
+		$.each(this.fieldCardslots.rows,function enableFieldcardslots(count,row){		//enable all fieldcardslots again
 			$.each(row,function(col,slot){
 				if(slot.card == null && slot.obj != null){slot.obj.enable();}
 			});
@@ -398,7 +430,7 @@ Crafty.c('table',{
 	,getAdjacentColCardCount: function(fieldcardslots){
 		var cardcountL = 0;
 		var cardcountR = 0;
-		$.each(fieldcardslots.rows,function(rowcount,row){
+		$.each(fieldcardslots.rows,function countAdjacentColCardCount(rowcount,row){
 			if(row[0].card != null){cardcountL++;}
 			if(row[4].card != null){cardcountR++;}
 		});
@@ -406,7 +438,7 @@ Crafty.c('table',{
 	}
 	,getAdjacentRowCardCount: function(fieldcardslots){
 		var cardCount = [];
-		$.each([fieldcardslots.rows[0],fieldcardslots.rows[4]],function(rowindex,row){
+		$.each([fieldcardslots.rows[0],fieldcardslots.rows[4]],function countAdjacentRowCardCount(rowindex,row){
 			cardCount[rowindex] = 0;
 			for(var i = 0; i <= 4; i++)
 			{
@@ -430,21 +462,5 @@ Crafty.c('table',{
 			colcount = (direction == "lr") ? (colcount+1) : (colcount-1);
 		}
 		return rowObj;
-	}
-	,shuffle: function(cards){
-		var currentIndex = cards.length
-	    , temporaryValue
-	    , randomIndex;
-		// While there remain elements to shuffle...
-		while (0 !== currentIndex) {
-			// Pick a remaining element...
-			randomIndex = Math.floor(Math.random() * currentIndex);
-			currentIndex -= 1;
-			// And swap it with the current element.
-			temporaryValue = cards[currentIndex];
-			cards[currentIndex] = cards[randomIndex];
-			cards[randomIndex] = temporaryValue;
-		}
-		return cards;
 	}
 });

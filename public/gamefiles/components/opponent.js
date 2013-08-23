@@ -1,16 +1,12 @@
-Crafty.c('player',{
+Crafty.c('opponent',{
 	id: null,
 	character: null,
-	table: null,
-	cards: null,
-	stackcards: null,
-	acitvecards: null,
 	cardslots: [],
 	healthDisplay: null,
+	cardslots: null,
 
-	player: function(id,table,charpos,healthPos,characterId){
+	opponent: function(id,charpos,healthPos,characterId){
 		this.id = id;
-		this.table = table;
 		this.characterId = characterId;
 		this.drawChar(charpos);
 		this.drawHealth(healthPos);
@@ -50,41 +46,47 @@ Crafty.c('player',{
 				this.stackcards.splice(randnumber,1);
 			}
 		}
+
+
+
+
 		return this;
 	}
-	,getHandCards: function(){
-		var cards = {};
-		$.each(this.acitvecards,function packHandCards(key,card){cards[key] = card.value;});
-		return cards;
+	,setCards: function(cards){
+		var that = this;
+			//remove old cards
+		$.each(Crafty('opponendCard'),function removeOpponentCard(key,cardId){Crafty(cardId).destroy();});
+			//set new cards
+		$.each(cards,function setOpponentCards(slot,cardvalue){
+			if(cardvalue == null){that.cardslots[slot].hasCard = false;}
+			else{
+
+				Crafty.e("2D, DOM, opponendCard, "+cardvalue)
+					.attr({
+						x: that.cardslots[slot].x+5,
+						y: that.cardslots[slot].y+5
+					});
+			}
+		});
 	}
 	,resetStackcards: function(){
-		this.stackcards = {};
-		this.acitvecards = [];
 		$.each(this.cardslots,function(key,cardslot){
 			cardslot.hasCard = false;
 		});
 		return this;
 	}
-	,setCards: function(cards){
-		this.stackcards = cards;
-		return this;
-	}
-	,setPlayerCardslots: function(playerCardslots){
-		this.playerCardslots = playerCardslots;
-		return this;
-	}
 	,isTurn: function(){
-		this.drawCards();
-		$.each(this.acitvecards,function(key,card){
-			card.enableDrag();
-		});
-		return this;
+		// this.drawCards();
+		// $.each(this.acitvecards,function(key,card){
+		// 	card.enableDrag();
+		// });
+		// return this;
 	}
 	,turnOver: function(){
-		$.each(this.acitvecards,function(key,card){
-			card.disableDrag();
-		});
-		return this;
+		// $.each(this.acitvecards,function(key,card){
+		// 	card.disableDrag();
+		// });
+		// return this;
 	}
 	,drawChar: function(charpos){
 		this.character = Crafty.e('2D,DOM,playerchar'+this.characterId).attr({x: charpos[0], y: charpos[1]});
@@ -101,8 +103,8 @@ Crafty.c('player',{
 								.textColor('#d83f46', 1);
 		return this;
 	}
-	,updateHealthDisplay: function(){
-		this.healthDisplay.text(this.hp);
+	,updateHealthDisplay: function(newHp){
+		this.healthDisplay.text(newHp);
 		return this;
 	}
 });
