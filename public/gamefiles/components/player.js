@@ -7,13 +7,16 @@ Crafty.c('player',{
 	acitvecards: null,
 	cardslots: [],
 	healthDisplay: null,
+	firstTurn: null,
 
-	player: function(id,table,charpos,healthPos,characterId){
+	player: function(id,table,charpos,healthPos,characterId,firstTurn){
 		this.id = id;
 		this.table = table;
 		this.characterId = characterId;
 		this.drawChar(charpos);
 		this.drawHealth(healthPos);
+		this.firstTurn = firstTurn;
+		console.log(firstTurn);
 		return this;
 	}
 	,drawCards: function(){
@@ -74,9 +77,11 @@ Crafty.c('player',{
 		return this;
 	}
 	,isTurn: function(){
+		$('.turnBadgeTop').animate({top:"0px"},500);
 		this.drawCards();
 		$.each(this.acitvecards,function(key,card){
 			card.enableDrag();
+			card.attr({'z': 500});
 		});
 		return this;
 	}
@@ -104,5 +109,11 @@ Crafty.c('player',{
 	,updateHealthDisplay: function(){
 		this.healthDisplay.text(this.hp);
 		return this;
+	}
+	,startPlaying: function(){
+		console.log("firstTurn: "+this.firstTurn);
+		if(this.firstTurn){
+			this.isTurn();
+		}
 	}
 });

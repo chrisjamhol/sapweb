@@ -20,26 +20,13 @@ Crafty.c('opponent',{
 			{
 				var that = this;
 				var randnumber = Math.floor((Math.random()*this.stackcards.length));		//random card from stack
-				var newCard = Crafty.e("2D, DOM, Card, Draggable,"+this.stackcards[randnumber])
+				var newCard = Crafty.e("2D, DOM, Card, "+this.stackcards[randnumber])
 								.Card(this.table)
 								.attr({
 									x: this.cardslots[i].x+5,
 									y: this.cardslots[i].y+5,
 									value: this.stackcards[randnumber],
 									sourceCardslot: i
-								})
-								.bind("StartDrag",function onStartDrag(){							//event start drag
-									this.oldpos.x = this.x;
-									this.oldpos.y = this.y;
-								})
-								.bind("StopDrag", function onStopDrag (data) {						//event stop drag
-									var card = this;
-									this.dropped(function onDropped(chosencardslot){
-										if(chosencardslot != "undefined")	//correct drop
-										{
-											that.cardslots[card.sourceCardslot].hasCard = false;
-										}
-									});
 								});
 				this.acitvecards.push(newCard);
 				this.cardslots[i]['hasCard'] = true;

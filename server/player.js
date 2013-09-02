@@ -5,6 +5,7 @@ module.exports = function(){
 	var create = function(id,playerdata){
 		player = {
 			id: id,
+			isTurn: null,
 			name: playerdata.name,
 			avatar: playerdata.avatar,
 			health: 120,
@@ -18,6 +19,9 @@ module.exports = function(){
 			,getPlayer: function(){
 				return this;
 			}
+			,checkIfTurn: function(){return this.isTurn;}
+			,isTurn: function(){this.isTurn = true;}
+			,turnOver: function(){this.isTurn = false;}
 		};
 		return player;
 	}

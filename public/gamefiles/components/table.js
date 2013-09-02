@@ -94,18 +94,33 @@ Crafty.c('table',{
 	,initSockets: function(){
 		var that = this;
 		this.socket.on("reciveOpponentCards",function onReciveOpponentCards(opponentCards){
-			that.setOpponentCards(opponentCards)
+			that.setOpponentCards(opponentCards);
+			that.player.startPlaying();
+			console.log("starting playing");
 		});
 		this.socket.on("sendPlayerCards",function onSendPlayerCards(){
 			console.log("onSendPlayerCards");
 			that.sendPlayerCards();
+		});
+		this.socket.on("getDroppedCard",function onGetDroppedCard(droppData){
+			console.log(droppData);
+			Crafty(droppData.card.value).destroy();
+			that.fieldCardslots.rows[droppData.cardslot.row][droppData.cardslot.col].card = Crafty.e("2D,DOM,Card,"+droppData.card.value).
+																								attr({
+																									x: that.fieldCardslots.rows[droppData.cardslot.row][droppData.cardslot.col].x+5,
+																									y: that.fieldCardslots.rows[droppData.cardslot.row][droppData.cardslot.col].y+5,
+																									value: droppData.card.value
+																								});
+		});
+		this.socket.on("takeDamage",function onTakeDamage(hits){
+			that.takeDamage(hits);
 		});
 	}
 		//helper to send via socket
 	,socketSend: function(statement,data){
 		if(data){this.socket.emit(statement,data);}else{this.socket.emit(statement);}
 	}
-	,newGame: function(playerdata,opponentdata,firstTurn){
+	,newGame: function(playerdata,opponentdata){
 		var that = this;
 			//setting up the player cardslots
 		$.each(this.playerCardslotsPos,function settingUpCardslots(playerkey,position){
@@ -125,7 +140,7 @@ Crafty.c('table',{
 		this.initPlayer(playerdata,opponentdata,function afterInitPlayer(){
 				//start new round
 			that.round = 0;
-			that.newRound(firstTurn);
+			that.newRound();
 		});
 	}
 	,initPlayer: function(playerdata,opponentdata,callback){
@@ -138,7 +153,8 @@ Crafty.c('table',{
 				that,								//link to table
 				that.playerCharPos[1],		//position for the avatar
 				that.playerHealthPos[1],
-				playerdata.avatar
+				playerdata.avatar,
+				playerdata.isTurn
 			);
 		//setting the attr for the player obj
 		that.player.life(playerdata.health);
@@ -157,7 +173,7 @@ Crafty.c('table',{
 		that.opponent.updateHealthDisplay(opponentdata.health);
 		callback();
 	}
-	,newRound: function(firstTurn){
+	,newRound: function(){
 		if(this.round != 0)									//first round no cards need to be cleard
 			{this.clearCards();}
 
@@ -165,8 +181,7 @@ Crafty.c('table',{
 		this.player.setCards(this.cards);		    			//give new cards (without the this.giveCards()) to the players stack
 		this.player.drawCards();
 
-		console.log("socked send");
-		this.socketSend("getOpponentCards");
+		this.socketSend("sendPlayerCards",this.player.getHandCards());
 
 		this.giveCards();
 		// if(this.turn.player == null)						//is first round
@@ -245,9 +260,18 @@ Crafty.c('table',{
 		});
 	}
 	,cardDropped: function(card,cardslot){
+		var that = this;
 			//comes from the event from card element!!! Assures that card is dropped correct
 		cardslot.setTaken();														//block slot til next round
 		this.fieldCardslots.rows[cardslot.row][cardslot.col].card = card;			//set refrents to the dropped card in slot
+		this.socketSend("cardDropped",{
+										"card": {"value": card.value},
+										"cardslot":
+										{
+											"row": cardslot.row,
+											"col": cardslot.col
+										}
+									});
 
 		if(this.turn.move < 1)
 		{
@@ -260,23 +284,32 @@ Crafty.c('table',{
 			this.checkForHits(cardslot,this.fieldCardslots,function handleHits(hits){			//checking for hits
 				if(hits.length > 0)															//if damage -> deal damage
 				{
-					that.dealDamage(hits,function checksAfterDealingDamages(){
-						if(that.player[victim].hp <= 0)
-						{
-							Crafty.winner = (that.player[victim].id == 1) ? 0 : 1;
-							Crafty.scene("won");
-						}
-						else
-						{
-							that.handleTurnEnd();
-						}
+					var damage = [];
+					$.each(hits,function getHitDamage(index,hit){
+						damage.push({
+							"name": hit.name,
+							"damage": that.player.attack(hit.label)
+						});
 					});
+					that.socketSend("inflictDamage",damage);
+					// that.dealDamage(hits,function checksAfterDealingDamages(){
+					// 	if(that.player[victim].hp <= 0)
+					// 	{
+					// 		Crafty.winner = (that.player[victim].id == 1) ? 0 : 1;
+					// 		Crafty.scene("won");
+					// 	}
+					// 	else
+					// 	{
+					// 		that.handleTurnEnd();
+					// 	}
+					// });
 				}
 				else
 				{
 					that.handleTurnEnd();
 				}
 			});
+
 		}
 	}
 	,limitDropzones: function(sourceCardslot,fieldcardslots){
@@ -390,6 +423,13 @@ Crafty.c('table',{
 			}
 		});
 
+	}
+	,takeDamage: function(hits){
+		var that = this;
+		console.log(hits);
+		$.each(hits,function takeHit(index,hit){
+			that.player.takeDamage(hit.damage).updateHealthDisplay();
+		});
 	}
 	,displayDamage: function(hitDescription,callback){
 			//updateing the hitDescription Lable

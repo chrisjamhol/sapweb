@@ -43,18 +43,23 @@ module.exports = function(cards){
 
 	var findMatch = function(id){
 		var playerMatched = false;
+		var foundMatch = null;
 		matches.forEach(function(match,key){
 			if(match[1] == null){
 				playerMatched = true;
 				match[1] = id;
 				getPlayerById(id).setPlayerNumber(2);
+				if(match['firstTurn'] == 1){getPlayerById(id).isTurn();}else{getPlayerById(id).turnOver();}
+				foundMatch = match;
 				return false;
 			}
 		});
 		if(!playerMatched)
 		{
-			matches.push({"0": id, "1": null});
+			var firstTurn = createFirstTurn();
+			matches.push({"0": id, "1": null, "firstTurn": firstTurn});
 			getPlayerById(id).setPlayerNumber(1);
+			if(firstTurn == 0){getPlayerById(id).isTurn();}else{getPlayerById(id).turnOver();}
 		}
 	}
 
@@ -76,7 +81,10 @@ module.exports = function(cards){
 		return cardstack;
 	}
 
-	var getFirstTurn = function(){return Math.floor((Math.random()*2));}
+	var createFirstTurn = function(){return Math.floor((Math.random()*2));}
+	var getFirstTurn = function(match){
+
+	}
 
 		//expose
 	return {

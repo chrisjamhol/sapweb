@@ -32,9 +32,10 @@ function onSocketConnection(client){
     client.on("getOpponentData",onGetOpponentData);
     client.on("getCards",onGetCards);
     client.on("turnOver",onTurnOver);
-    client.on("cardsDropped",onCardsDropped);
-    client.on("getOpponentCards",onGetOpponentCards);
     client.on("sendPlayerCards",onSendPlayerCards);
+
+    client.on("cardDropped",onCardDropped);
+    client.on("inflictDamage",onInflictDamage);
 }
 
 function onClientDisconnect(playerId){gamemaster.removePlayer(playerId);}
@@ -55,8 +56,6 @@ function onGetOpponentData(){
     if(opponentIds[0] && opponentIds[1])
     {
         var fieldCards = gamemaster.giveCards();
-        var firstTurn = gamemaster.getFirstTurn();
-        console.log(firstTurn);
         var otherPlayerId = (this.id == opponentIds[0]) ? opponentIds[1] : opponentIds[0];
             //send player data
         this.emit("getOpponentData",gamemaster.getPlayerById(otherPlayerId));
@@ -64,29 +63,17 @@ function onGetOpponentData(){
             //send commoun cards
         this.emit("getTableData",fieldCards);
         io.sockets.socket(otherPlayerId).emit("getTableData",fieldCards);
-            //send who's turn
-        this.emit("getFirstTurn",firstTurn);
-        io.sockets.socket(otherPlayerId).emit("getFirstTurn",firstTurn);
     }
 }
 
-function onGetOpponentCards(){
-    console.log("getOpponentCards from "+this.id);
-    var opponentIds = gamemaster.getOpponentIdFrom(this.id);
-    var otherPlayerId = (this.id == opponentIds[0]) ? opponentIds[1] : opponentIds[0];
-    console.log("sendPlayerCards send to "+otherPlayerId);
-    io.sockets.socket(otherPlayerId).emit("sendPlayerCards");
-}
-
 function onSendPlayerCards(playerCards){
-    console.log("sendPlayerCards from "+this.id);
-    var opponentIds = gamemaster.getOpponentIdFrom(this.id);
-    var otherPlayerId = (this.id == opponentIds[0]) ? opponentIds[1] : opponentIds[0];
-    console.log("this.id: "+this.id);
-    console.log("otherPlayerId: "+otherPlayerId);
+    // console.log("sendPlayerCards from "+this.id);
+    var otherPlayerId = getOtherPlayerId(this.id);
+    // console.log("this.id: "+this.id);
+    // console.log("otherPlayerId: "+otherPlayerId);
     io.sockets.socket(otherPlayerId).emit("reciveOpponentCards",playerCards);
-    console.log(playerCards);
-    console.log("send to "+otherPlayerId);
+    // console.log(playerCards);
+    // console.log("send to "+otherPlayerId);
 }
 
 function onGetCards(){
@@ -99,8 +86,18 @@ function onTurnOver(){
     gamemaster.turnOver(opponentAction);
 }
 
-function onCardsDropped(){
+function onCardDropped(droppData){
+    io.sockets.socket(getOtherPlayerId(this.id)).emit("getDroppedCard",droppData);
+}
 
+function onInflictDamage(hits){
+    io.sockets.socket(getOtherPlayerId(this.id)).emit("takeDamage",hits);
+}
+
+function getOtherPlayerId(id){
+    var opponentIds = gamemaster.getOpponentIdFrom(id);
+    var otherPlayerId = (id == opponentIds[0]) ? opponentIds[1] : opponentIds[0];
+    return otherPlayerId;
 }
 
 function configExpress(app){

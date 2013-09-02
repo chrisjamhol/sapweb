@@ -1,3 +1,7 @@
+#crafty_stage{
+	margin: 0 auto;
+}
+
 .hpDisplay{
 	-webkit-text-stroke-width: 1px;
 	-webkit-text-stroke-color: black;
@@ -10,4 +14,38 @@
 	-webkit-text-stroke-color: black;
 	-moz-text-stroke-width: 1px;
 	-moz-text-stroke-color: black;
+}
+
+.turnBadge{
+	display: none;
+	position: absolute;
+	background-color: red;
+	z-index: 500;
+	font-family: PipeDream;
+}
+
+.turnBadgeTop{
+	top: -120px;	/*0*/
+	left: 486px;
+	width: 50px;
+	height: 110px;
+	text-align: center;
+	border-bottom-right-radius: 15px;
+	border-bottom-left-radius: 15px;
+	padding-top: 7px;
+	border: 1px solid black;
+	border-top: none;
+}
+
+.turnBadgeBottom{
+	top: 603px; /*483*/
+	left: 486px;
+	width: 50px;
+	height: 110px;
+	text-align: center;
+	border-top-right-radius: 15px;
+	border-top-left-radius: 15px;
+	padding-bottom: 7px;
+	border: 1px solid black;
+	border-bottom: none;
 }

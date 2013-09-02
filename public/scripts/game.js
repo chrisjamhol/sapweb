@@ -4,12 +4,11 @@ Game = {
 		console.log(playerdata);
 		console.log(opponentdata);
 	},
-	start: function startGame(tabledata,playerdata,opponentdata,firstTurn,socket)
+	start: function startGame(tabledata,playerdata,opponentdata,socket)
 	{
 		var tabledata = tabledata,
 			playerdata = playerdata,
 			opponentdata = opponentdata,
-			firstTurn = firstTurn
 			socket = socket;
 
 		Crafty.winner = null;
@@ -53,7 +52,8 @@ Game = {
 			Crafty.scene("main", function sceneMain() {
 				Crafty.e("2D,DOM,Image").image(gamefilespath+'background/background1.png').attr({z:-1});
 				var table = Crafty.e("2D,DOM,table").table(cards,tabledata,socket);
-				table.newGame(playerdata,opponentdata,firstTurn);
+				$('.turnBadge').show();
+				table.newGame(playerdata,opponentdata);
 			});
 
 			Crafty.scene("won",function sceneWon(){

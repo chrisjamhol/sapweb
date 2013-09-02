@@ -8,7 +8,6 @@ $('document').ready(function onDocumentReady(){
 	socket.on("loggedin",onUserLoggedIn);
 	socket.on("getOpponentData",onGetOpponentData);
 	socket.on("getTableData",onGetTableData);
-	socket.on("getFirstTurn",onGetFirstTurn);
 
 	$('#playerloginButton').click(function clickedLogin(){
 		var playername = $('#login_name').val();
@@ -27,15 +26,13 @@ $('document').ready(function onDocumentReady(){
 
 	function onGetOpponentData(opponent){opponentData = opponent;}
 
-	function onGetTableData(table){tabledata = table;}
-
-	function onGetFirstTurn(firstTurn){
+	function onGetTableData(table){
 		$('.waitingDisplay').hide();
-		console.log(tabledata);
-		console.log(playerdata);
-		console.log(opponentData);
-		console.log(firstTurn);
-		Game.start(tabledata,playerdata,opponentData,firstTurn,socket);
+		tabledata = table;
+			// console.log(tabledata);
+			// console.log(playerdata);
+			// console.log(opponentData);
+		Game.start(tabledata,playerdata,opponentData,socket);
 		$('#logon').hide();
 	}
 });
