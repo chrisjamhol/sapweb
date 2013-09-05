@@ -12,33 +12,6 @@ Crafty.c('opponent',{
 		this.drawHealth(healthPos);
 		return this;
 	}
-	,drawCards: function(){
-		var limit = Object.keys(this.cardslots).length;
-		for(var i=0;i<=limit-1;i++)
-		{
-			if(this.cardslots[i].hasCard == false)				//each slot without card gets a card
-			{
-				var that = this;
-				var randnumber = Math.floor((Math.random()*this.stackcards.length));		//random card from stack
-				var newCard = Crafty.e("2D, DOM, Card, "+this.stackcards[randnumber])
-								.Card(this.table)
-								.attr({
-									x: this.cardslots[i].x+5,
-									y: this.cardslots[i].y+5,
-									value: this.stackcards[randnumber],
-									sourceCardslot: i
-								});
-				this.acitvecards.push(newCard);
-				this.cardslots[i]['hasCard'] = true;
-				this.stackcards.splice(randnumber,1);
-			}
-		}
-
-
-
-
-		return this;
-	}
 	,setCards: function(cards){
 		var that = this;
 			//remove old cards
@@ -56,6 +29,14 @@ Crafty.c('opponent',{
 			}
 		});
 	}
+	,setHandCard: function(cardData){
+		this.cardslots[cardData.slot].hasCard = true;
+		var newCard = Crafty.e("2D, DOM, opponendCard, "+cardData.card.value)
+			.attr({
+				x: this.cardslots[cardData.slot].x+5,
+				y: this.cardslots[cardData.slot].y+5
+			});
+	}
 	,resetStackcards: function(){
 		$.each(this.cardslots,function(key,cardslot){
 			cardslot.hasCard = false;
@@ -63,17 +44,12 @@ Crafty.c('opponent',{
 		return this;
 	}
 	,isTurn: function(){
-		// this.drawCards();
-		// $.each(this.acitvecards,function(key,card){
-		// 	card.enableDrag();
-		// });
-		// return this;
+		$('.turnBadgeBottom').addClass('turnBadgeBottomTurn');
+		return this;
 	}
 	,turnOver: function(){
-		// $.each(this.acitvecards,function(key,card){
-		// 	card.disableDrag();
-		// });
-		// return this;
+		$('.turnBadgeBottom').removeClass('turnBadgeBottomTurn');
+		return this;
 	}
 	,drawChar: function(charpos){
 		this.character = Crafty.e('2D,DOM,playerchar'+this.characterId).attr({x: charpos[0], y: charpos[1]});
@@ -90,7 +66,11 @@ Crafty.c('opponent',{
 								.textColor('#d83f46', 1);
 		return this;
 	}
-	,updateHealthDisplay: function(newHp){
+	,updateHealthDisplay: function(){
+		if(this.hp < 0)
+			{var newHp = 0;}
+		else
+			{var newHp = this.hp;}
 		this.healthDisplay.text(newHp);
 		return this;
 	}

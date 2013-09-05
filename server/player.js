@@ -8,9 +8,10 @@ module.exports = function(){
 			isTurn: null,
 			name: playerdata.name,
 			avatar: playerdata.avatar,
-			health: 120,
+			health: 100,
 			shield: 20,
-			weapon: "w_stick",
+			// weapon: "w_stick",
+			weapon: "w_mightyhammer",
 			playernumber: null
 
 			,setPlayerNumber: function(playernumber){

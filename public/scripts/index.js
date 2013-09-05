@@ -3,7 +3,7 @@ $('document').ready(function onDocumentReady(){
 	var opponentData = null;
 	var tabledata = null;
 	var logoninfo = null;
-	var socket = io.connect('http://localhost');
+	var socket = io.connect(sockethost);
 
 	socket.on("loggedin",onUserLoggedIn);
 	socket.on("getOpponentData",onGetOpponentData);

@@ -16,17 +16,18 @@ Crafty.c('player',{
 		this.drawChar(charpos);
 		this.drawHealth(healthPos);
 		this.firstTurn = firstTurn;
-		console.log(firstTurn);
 		return this;
 	}
 	,drawCards: function(){
 		var limit = Object.keys(this.cardslots).length;
+		var newCardsData = [];
 		for(var i=0;i<=limit-1;i++)
 		{
 			if(this.cardslots[i].hasCard == false)				//each slot without card gets a card
 			{
 				var that = this;
 				var randnumber = Math.floor((Math.random()*this.stackcards.length));		//random card from stack
+				console.log(this.table);
 				var newCard = Crafty.e("2D, DOM, Card, Draggable,"+this.stackcards[randnumber])
 								.Card(this.table)
 								.attr({
@@ -51,9 +52,10 @@ Crafty.c('player',{
 				this.acitvecards.push(newCard);
 				this.cardslots[i]['hasCard'] = true;
 				this.stackcards.splice(randnumber,1);
+				newCardsData.push({"slot": i, "card": {"value": newCard.value}});
 			}
 		}
-		return this;
+		return newCardsData;
 	}
 	,getHandCards: function(){
 		var cards = {};
@@ -63,7 +65,7 @@ Crafty.c('player',{
 	,resetStackcards: function(){
 		this.stackcards = {};
 		this.acitvecards = [];
-		$.each(this.cardslots,function(key,cardslot){
+		$.each(this.cardslots,function resetCardslot(key,cardslot){
 			cardslot.hasCard = false;
 		});
 		return this;
@@ -77,15 +79,16 @@ Crafty.c('player',{
 		return this;
 	}
 	,isTurn: function(){
-		$('.turnBadgeTop').animate({top:"0px"},500);
-		this.drawCards();
+		var newCards = this.drawCards();
+		$('.turnBadgeTop').addClass('turnBadgeTopTurn');
 		$.each(this.acitvecards,function(key,card){
 			card.enableDrag();
 			card.attr({'z': 500});
 		});
-		return this;
+		return newCards;
 	}
 	,turnOver: function(){
+		$('.turnBadgeTop').removeClass('turnBadgeTopTurn');
 		$.each(this.acitvecards,function(key,card){
 			card.disableDrag();
 		});
@@ -106,14 +109,23 @@ Crafty.c('player',{
 								.textColor('#d83f46', 1);
 		return this;
 	}
-	,updateHealthDisplay: function(){
-		this.healthDisplay.text(this.hp);
-		return this;
+	,removeCardsFromStack: function(cards){
+		var that = this;
+		$.each(cards,function removeCardFromStack(index,card){
+			that.stackcards.splice(that.stackcards.indexOf(card),1);
+		});
 	}
 	,startPlaying: function(){
-		console.log("firstTurn: "+this.firstTurn);
 		if(this.firstTurn){
 			this.isTurn();
 		}
+	}
+	,updateHealthDisplay: function(){
+		if(this.hp < 0)
+			{var newHp = 0;}
+		else
+			{var newHp = this.hp;}
+		this.healthDisplay.text(newHp);
+		return this;
 	}
 });

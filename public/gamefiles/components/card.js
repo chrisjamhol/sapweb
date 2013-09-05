@@ -35,7 +35,10 @@ Crafty.c('Card',{
 						var card = data[0].obj;
 						card.x = this.x+5;
 						card.y = this.y+5;
+						console.log("sdf");
+						// console.log(card);
 						card.table.cardDropped(card,this);
+						console.log("fds");
 						card.droppedCorrect = true;
 						callback(this);
 					});

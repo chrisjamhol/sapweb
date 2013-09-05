@@ -15,11 +15,6 @@ module.exports = function(app,publics){
 	    publicComponentsPath: path.join(__dirname, '../../' , publics.components)
 	}
 
-	//-----routes--------
-	app.get('/',function(req,res){
-	    res.render('index');
-	});
-
 	//piping css and js
 	app.get('/htmlmanifest.appcache',function(req,res){res.sendfile('htmlmanifest.appcache');});
 	app.get('/public/scripts/:scriptName',function(req,res){res.sendfile(publicPaths.publicScriptPath+req.params['scriptName']);});

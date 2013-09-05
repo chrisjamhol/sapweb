@@ -64,7 +64,7 @@ module.exports = function(cards){
 	}
 
 	var shuffle = function(cards){
-		var cardstack = cards;
+		var cardstack = Object.create(cards);
 		var currentIndex = cardstack.length
 	    , temporaryValue
 	    , randomIndex;
