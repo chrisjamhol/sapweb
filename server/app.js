@@ -1,18 +1,156 @@
-var http = require('http'),
-    port = 8080,
-     url = 'http://localhost:' + port + '/';
-/* We can access nodejitsu enviroment variables from process.env */
-/* Note: the SUBDOMAIN variable will always be defined for a nodejitsu app */
+var fs = require('fs')
+    path = require('path');
+var config = JSON.parse(fs.readFileSync(__dirname, "config.json");
+
+var host = config.server.host,
+var port = config.server.port;
 if(process.env.SUBDOMAIN){
-  url = 'http://' + process.env.SUBDOMAIN + '.jit.su/';
+    var host = 'http://' + process.env.SUBDOMAIN + '.jit.su/';
 }
 
-http.createServer(function (req, res) {
-  res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.write(':)');
-  res.end();
-}).listen(port);
+var __modelsPath = path.join(__dirname, '../' , 'models/');
+  //create express server
+var express = require('express')
+    ,app = express()
+    ,routes = require('./routes/routes')(app,config.publicPaths)
+    ,http = require('http')
+    ,server = http.createServer(app)
+    ,io = require('socket.io').listen(server).set('log level',2)
+    ,gamemaster = require('./gamemaster')(config.cards);
+    server.listen(port,host);
+    console.log("Server started on: "+host+":"+port);
+configExpress(app);
 
+app.get('/',function(req,res){
+        res.render('index',{sockethost: config.server.host});
+});
 
+function init(){
+    // Start listening for events
+    setEventHandlers();
+}
 
-console.log('The http server has started at: ' + url);
+var setEventHandlers = function() {
+    // Socket.IO
+    io.sockets.on("connection", onSocketConnection);
+};
+
+function onSocketConnection(client){
+    //client.on("disconnect",function(){onClientDisconnect(client.id);});
+    client.on("login",onLoginUser);
+    client.on("getPlayerData",onGetPlayerData);
+    client.on("getOpponentData",onGetOpponentData);
+    client.on("getCards",onGetCards);
+    client.on("turnOver",onTurnOver);
+    client.on("newRound",onNewRound);
+    client.on("recievedOpponentCards",onRecievedOpponentCards);
+    client.on("playerFinishedRound", onPlayerFinishedRound);
+
+    client.on("sendPlayerCards",onSendPlayerCards);
+    client.on("newHandCards",onNewHandCards);
+
+    client.on("cardDropped",onCardDropped);
+    client.on("inflictDamage",onInflictDamage);
+    client.on("tookDamage",onTookDamage);
+    client.on("hitsTaken",onHitsTaken);
+
+    client.on("lose",onLose);
+}
+
+function onClientDisconnect(playerId){gamemaster.removePlayer(playerId);}
+
+function onLoginUser(playerdata){
+    //console.log(playerdata);
+    var player = gamemaster.addPlayer(this.id,playerdata);
+    this.emit("loggedin",player);
+}
+
+function onGetPlayerData(){
+    var player = gamemaster.getPlayerById(this.id);
+    this.emit("getPlayerData",player);
+}
+
+function onGetOpponentData(){
+    var opponentIds = gamemaster.getOpponentIdFrom(this.id);
+    if(opponentIds[0] && opponentIds[1])
+    {
+        var fieldCards = gamemaster.giveCards();
+        var otherPlayerId = (this.id == opponentIds[0]) ? opponentIds[1] : opponentIds[0];
+            //send player data
+        this.emit("getOpponentData",gamemaster.getPlayerById(otherPlayerId));
+        io.sockets.socket(otherPlayerId).emit("getOpponentData",gamemaster.getPlayerById(this.id));
+            //send commoun cards
+        this.emit("getTableData",fieldCards);
+        io.sockets.socket(otherPlayerId).emit("getTableData",fieldCards);
+    }
+}
+
+function onSendPlayerCards(playerCards){
+    io.sockets.socket(getOtherPlayerId(this.id)).emit("reciveOpponentCards",playerCards);       //player has first turn
+}
+
+function onRecievedOpponentCards(opponentCards){
+    io.sockets.socket(getOtherPlayerId(this.id)).emit("opponentCardsRecived",opponentCards);    //player has first turn
+}
+
+function onNewHandCards(handcards){
+    io.sockets.socket(getOtherPlayerId(this.id)).emit("newOpponentHandCards",handcards);
+}
+
+function onGetCards(){
+    var cards = gamemaster.giveCards();
+    this.emit("getCards",cards);
+}
+
+function onCardDropped(droppData){
+    io.sockets.socket(getOtherPlayerId(this.id)).emit("getDroppedCard",droppData);
+}
+
+function onInflictDamage(hits){
+    io.sockets.socket(getOtherPlayerId(this.id)).emit("takeDamage",hits);
+}
+
+function onTookDamage(damage){
+    io.sockets.socket(getOtherPlayerId(this.id)).emit("tookDamage",damage);
+}
+
+function onHitsTaken(){
+     io.sockets.socket(getOtherPlayerId(this.id)).emit("hitsTaken");
+}
+
+function onTurnOver(){
+    io.sockets.socket(getOtherPlayerId(this.id)).emit("startTurn");
+}
+
+function onNewRound(){
+    var fieldCards = gamemaster.giveCards();
+    this.emit("newRound",fieldCards);
+    io.sockets.socket(getOtherPlayerId(this.id)).emit("newRound",fieldCards);
+}
+
+function onPlayerFinishedRound(){
+    io.sockets.socket(getOtherPlayerId(this.id)).emit("playerFinishedRound");
+}
+
+function onLose(){
+    io.sockets.socket(getOtherPlayerId(this.id)).emit("won");
+}
+
+function getOtherPlayerId(id){
+    var opponentIds = gamemaster.getOpponentIdFrom(id);
+    var otherPlayerId = (id == opponentIds[0]) ? opponentIds[1] : opponentIds[0];
+    return otherPlayerId;
+}
+
+function configExpress(app){
+    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+    app.use(app.router);
+    app.use(express.compress());
+    app.use(express.static(publicPaths.publicViewPath));
+    app.set('views', publicPaths.publicViewPath);
+    app.set('view engine','ejs');
+    app.set('view options',{open:"<%",close:"%>"});
+}
+
+//starting engines :)
+init();
