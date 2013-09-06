@@ -1,7 +1,7 @@
 {
 	"server": {
 				"port": "3000",
-				"host": "http://swordandpoker-28127.usw1.actionbox.io"
+				"host": "0.0.0.0"
 			},
 	"publicPaths":
 			{
