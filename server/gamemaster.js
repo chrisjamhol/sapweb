@@ -1,6 +1,6 @@
 module.exports = function(cards){
 	var cards = cards;
-	var Player = require('./Player');
+	var Player = require('./player');
 	var players =  {};
 	var matches = [];
 
