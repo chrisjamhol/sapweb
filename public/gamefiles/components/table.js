@@ -64,6 +64,51 @@ Crafty.c('table',{
 					});
 				});
 			},
+			setCardsOpacity: function(opacity){
+				$.each(this.rows,function(key,row){
+					$.each(row,function(col,slot){
+						if(slot.card){
+							slot.card.css("opacity",opacity);
+						};
+					});
+				});
+			},
+			setCardOpacity: function(data){
+				switch(data.mode){
+					case "row":
+						$.each(this.rows[data.row],function setCardOpacityRow(index,col){
+							if(col.card)
+								{col.card.css("opacity",data.opacity);}
+						});
+						break;
+					case "col":
+						$.each(this.rows,function setCardOpacityCol(index,row){
+							if(row[data.col].card)
+								{row[data.col].card.css("opacity",data.opacity);}
+						});
+						break;
+					case "diagonal":
+						switch(data.direction){
+							case "toLeft":
+								var col = 4;
+								$.each(this.rows,function setCardOpacityDiagonalToLeft(index,row){
+									if(row[col].card)
+										{row[col].card.css("opacity",data.opacity);}
+									col--;
+								});
+								break;
+							case "toRight":
+								var col = 0;
+								$.each(this.rows,function setCardOpacityDiagonalToRight(index,row){
+									if(row[col].card)
+										{row[col].card.css("opacity",data.opacity);}
+									col++;
+								});
+								break;
+						}
+				}
+				//this.rows[row][col].card.css("opacity",opacity);
+			},
 			rows: []
 		};
 
@@ -326,6 +371,7 @@ Crafty.c('table',{
 		{
 			var that = this;
 			this.moves++;
+			this.fieldCardslots.setCardsOpacity("1");
 			this.checkForHits(cardslot,this.fieldCardslots,function handleHits(hits){			//checking for hits
 				if(hits.length > 0)															//if damage -> deal damage
 				{
@@ -350,29 +396,32 @@ Crafty.c('table',{
 		var row = sourceCardslot.row, col = sourceCardslot.col;
 		//------------> disable all <----------------
 		fieldcardslots.modify('disable');
+		fieldcardslots.setCardsOpacity("0.7");
 		//------------> enable allowed <----------------
 			//easy cols and rows
 		if( (row > 0 && row < 4) && (col == 0 || col == 4) )		//horizontal
 		{
 			if(col == 0){fieldcardslots.rows[row][4].obj.enable();}
 			else if(col == 4){fieldcardslots.rows[row][0].obj.enable();}
+			fieldcardslots.setCardOpacity({mode: "row",row: row,opacity: "1"});
 		}
 		else if( (col > 0 && col < 4) && (row == 0 || row == 4) )	//vertical
 		{
 			if(row == 0){fieldcardslots.rows[4][col].obj.enable();}
 			else if(row == 4){fieldcardslots.rows[0][col].obj.enable();}
+			fieldcardslots.setCardOpacity({mode: "col",col: col,opacity: "1"});
 		}
 		else if( (row == 0 || row == 4) && (col == 0 || col == 4) )
 		{
 			//corners
 			if(row == 0 && col == 0)	//top left
-			{fieldcardslots.rows[4][4].obj.enable();}
+			{fieldcardslots.rows[4][4].obj.enable(); fieldcardslots.setCardOpacity({mode: "diagonal",direction: "toRight",opacity: "1"});}
 			if(row == 4 && col == 0)	//bottom left
-			{fieldcardslots.rows[0][4].obj.enable();}
+			{fieldcardslots.rows[0][4].obj.enable(); fieldcardslots.setCardOpacity({mode: "diagonal",direction: "toRight",opacity: "1"});}
 			if(row == 0 && col == 4)	//top right
-			{fieldcardslots.rows[4][0].obj.enable();}
+			{fieldcardslots.rows[4][0].obj.enable(); fieldcardslots.setCardOpacity({mode: "diagonal",direction: "toLeft",opacity: "1"});}
 			if(row == 4 && col == 4)	//bottom right
-			{fieldcardslots.rows[0][0].obj.enable();}
+			{fieldcardslots.rows[0][0].obj.enable(); fieldcardslots.setCardOpacity({mode: "diagonal",direction: "toLeft",opacity: "1"});}
 		}
 	}
 	,checkForHits: function(sourceCardslot,fieldcardslots,callback){			//get affected rows and check them agains the rules
