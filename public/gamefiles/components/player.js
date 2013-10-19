@@ -7,15 +7,17 @@ Crafty.c('player',{
 	acitvecards: null,
 	cardslots: [],
 	healthDisplay: null,
+	nameDisplay: null,
 	firstTurn: null,
 
-	player: function(id,table,charpos,healthPos,characterId,firstTurn){
+	player: function(id,table,charpos,healthPos,characterId,playername,firstTurn){
 		this.id = id;
 		this.table = table;
 		this.characterId = characterId;
 		this.drawChar(charpos);
 		this.drawHealth(healthPos);
 		this.firstTurn = firstTurn;
+		this.name = playername;
 		return this;
 	}
 	,drawCards: function(){
@@ -107,6 +109,18 @@ Crafty.c('player',{
 									weight: 'bold'
 								})
 								.textColor('#d83f46', 1);
+		return this;
+	}
+	,drawName: function(){
+		this.nameDisplay = Crafty.e('2D,DOM,Text,nameDisplay')
+								.attr({x: healthPos[0], y: healthPos[1]})
+								.textFont({
+									family: 'PipeDream',
+									size: '35px',
+									weight: 'bold'
+								})
+								.textColor('#d83f46', 1)
+								.text(this.name);
 		return this;
 	}
 	,removeCardsFromStack: function(cards){

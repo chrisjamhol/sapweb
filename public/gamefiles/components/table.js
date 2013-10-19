@@ -258,6 +258,7 @@ Crafty.c('table',{
 				that.playerCharPos[1],		//position for the avatar
 				that.playerHealthPos[1],
 				playerdata.avatar,
+				playerdata.name,
 				playerdata.isTurn
 			);
 		//setting the attr for the player obj
