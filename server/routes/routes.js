@@ -12,6 +12,7 @@ module.exports = function(app,publics){
 	    publicLibaryPath: path.join(__dirname, '../../' , publics.libaries),
 	    publicFontPath: path.join(__dirname, '../../' , publics.fonts),
 	    publicGamefilesPath: path.join(__dirname, '../../' , publics.gamefiles),
+	    publicSpritesPath: path.join(__dirname, '../../', publics.sprites),
 	    publicComponentsPath: path.join(__dirname, '../../' , publics.components)
 	}
 

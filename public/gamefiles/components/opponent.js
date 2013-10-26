@@ -3,13 +3,17 @@ Crafty.c('opponent',{
 	character: null,
 	cardslots: [],
 	healthDisplay: null,
+	opponentnameDisplay: null,
 	cardslots: null,
+	opponentname: null,
 
-	opponent: function(id,charpos,healthPos,characterId){
+	opponent: function(id,name,charpos,healthPos,namePos,characterId){
 		this.id = id;
+		this.opponentname = name;
 		this.characterId = characterId;
 		this.drawChar(charpos);
 		this.drawHealth(healthPos);
+		this.drawName(namePos);
 		return this;
 	}
 	,setCards: function(cards){
@@ -64,6 +68,18 @@ Crafty.c('opponent',{
 									weight: 'bold'
 								})
 								.textColor('#d83f46', 1);
+		return this;
+	}
+	,drawName: function(namePos){
+		this.opponentnameDisplay = Crafty.e('2D,DOM,Text,nameDisplay')
+									.attr({x: namePos[0], y: namePos[1]})
+									.textFont({
+										family: 'PipeDream',
+										size: '35px',
+										weight: 'bold'
+									})
+									.textColor('#d83f46', 1)
+									.text(this.opponentname);
 		return this;
 	}
 	,updateHealthDisplay: function(){

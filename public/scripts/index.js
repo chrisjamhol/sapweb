@@ -5,6 +5,7 @@ $('document').ready(function onDocumentReady(){
 	var logoninfo = null;
 	var socket = io.connect(sockethost);
 
+	socket.on("disconnected",onDisconnect);
 	socket.on("loggedin",onUserLoggedIn);
 	socket.on("getOpponentData",onGetOpponentData);
 	socket.on("getTableData",onGetTableData);
@@ -17,6 +18,10 @@ $('document').ready(function onDocumentReady(){
 			socket.emit('login',logoninfo);
 		}
 	});
+
+	function onDisconnect(){
+		location.reload();
+	}
 
 	function onUserLoggedIn(player){
 		$('.waitingDisplay').show();

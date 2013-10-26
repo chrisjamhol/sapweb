@@ -13,6 +13,7 @@
 				"libaries": "public/libary/",
 				"fonts": "public/fonts/",
 				"gamefiles": "public/gamefiles/",
+				"sprites": "public/gamefiles/sprites/",
 				"components": "public/scripts/gamefiles/components/"
 			},
 	"cards": [

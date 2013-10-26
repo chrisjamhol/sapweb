@@ -12,8 +12,8 @@ Game = {
 			socket = socket;
 
 		Crafty.winner = null;
-		//var spritepath = "/public/gamefiles/sprites/";
-		var spritepath = "http://192.168.1.222/webroot_chris/test/"
+		var spritepath = "/public/gamefiles/sprites/";
+		//var spritepath = "http://192.168.1.222/webroot_chris/test/"
 		var gamefilespath = "/public/gamefiles/";
 		loadComponents(['card','player','opponent','table','rules','fieldcardslot','life','weaponComp','shield'
 							,'weapons/w_stick'

@@ -15,9 +15,17 @@ var express = require('express')
     console.log("Server started on: "+config.server.host+":"+config.server.port);
 configExpress(app);
 
+//app.use('/public/gamefiles/sprites/cards/cards.png', static('public/gamefiles/sprites/cards/cards.png',3600) );
+
+
+
 app.get('/',function(req,res){
         res.render('index',{sockethost: config.server.host});
 });
+
+var static = function(dirname, age) {
+    return express.static(path.join(__dirname, dirname), { maxAge: age });
+}
 
 function init(){
     // Start listening for events
@@ -26,11 +34,11 @@ function init(){
 
 var setEventHandlers = function() {
     // Socket.IO
-    io.sockets.on("connection", onSocketConnection);
+    io.sockets.on("connection", onSocketConnection);    
 };
 
 function onSocketConnection(client){
-    //client.on("disconnect",function(){onClientDisconnect(client.id);});
+    client.on("disconnect",function(){onClientDisconnect(client.id);});
     client.on("login",onLoginUser);
     client.on("getPlayerData",onGetPlayerData);
     client.on("getOpponentData",onGetOpponentData);
@@ -51,7 +59,19 @@ function onSocketConnection(client){
     client.on("lose",onLose);
 }
 
-function onClientDisconnect(playerId){gamemaster.removePlayer(playerId);}
+function onClientDisconnect(playerId){
+    var opponentIds = gamemaster.getOpponentIdFrom(playerId);
+    if(opponentIds != null){
+        if(opponentIds[0] && opponentIds[1]){
+            var otherPlayerId = (this.id == opponentIds[0]) ? opponentIds[1] : opponentIds[0];       
+            gamemaster.removePlayer(otherPlayerId);
+        }
+        gamemaster.removePlayer(playerId);
+        gamemaster.deleteMatch(gamemaster.getPlayersMatch(playerId));
+        io.sockets.socket(otherPlayerId).emit("disconnected");
+    } 
+   
+}
 
 function onLoginUser(playerdata){
     //console.log(playerdata);
@@ -140,7 +160,9 @@ function configExpress(app){
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
     app.use(app.router);
     app.use(express.compress());
-    app.use(express.static(publicPaths.publicViewPath));
+    
+    app.use(express.static(path.join(__dirname, '../../' , publicPaths.publicSpritesPath), { maxAge: 86400000 }));
+    //app.use(express.static(publicPaths.publicViewPath));
     app.set('views', publicPaths.publicViewPath);
     app.set('view engine','ejs');
     app.set('view options',{open:"<%",close:"%>"});

@@ -27,9 +27,13 @@ Crafty.c('table',{
 					2: [830,310]		//player 2
 				},
 	playerHealthPos: {
-					1: [715,150],		//player 1
-					2: [715,375]		//player 2
-				}
+					1: [560,150],		//player 1
+					2: [560,375]		//player 2
+				},
+    playerNamePos: {
+    				1: [560,200],		//player 1
+					2: [560,325]		//player 2
+    }
 	,table: function(cards,data,socket){
 		this.cards = cards;
 		this.allCards = cards;
@@ -257,6 +261,7 @@ Crafty.c('table',{
 				that,								//link to table
 				that.playerCharPos[1],		//position for the avatar
 				that.playerHealthPos[1],
+				that.playerNamePos[1],
 				playerdata.avatar,
 				playerdata.name,
 				playerdata.isTurn
@@ -267,12 +272,14 @@ Crafty.c('table',{
 		that.player.shield(playerdata.shield);
 		that.player.updateHealthDisplay();
 
-		//create the opponent obj
+		//create the opponent obj		
 		that.opponent
 			.opponent(
 				opponentdata.id,
+				opponentdata.name,
 				that.playerCharPos[2],
 				that.playerHealthPos[2],
+				that.playerNamePos[2],
 				opponentdata.avatar
 			);
 		that.opponent.life(opponentdata.health);
@@ -288,6 +295,10 @@ Crafty.c('table',{
 		this.giveCards();
 		if(this.player.firstTurn){
 			this.socketSend("sendPlayerCards",this.player.drawCards());
+		}else{
+			console.log("not first turn");
+			$('.turnBadgeBottom').addClass('turnBadgeBottomTurn');
+			//this.opponent.isTurn();	
 		}
 
 	}

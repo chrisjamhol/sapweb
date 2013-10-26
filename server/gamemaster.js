@@ -25,7 +25,7 @@ module.exports = function(cards){
 	}
 
 	var removePlayer = function(playerId){
-		players.splice(players.indexOf(playerId), 1);
+		delete players[playerId];
 	}
 
 	var getPlayers = function(){return players;}
@@ -63,6 +63,15 @@ module.exports = function(cards){
 		}
 	}
 
+	var getPlayersMatch = function(playerId){
+		matches.forEach(function(match,key){
+			if(match[0] == playerId || match[1] == playerId){return key;}
+			else{return null;}
+		});
+	}
+
+	var deleteMatch = function(matchId){matches.splice(matches.indexOf(matchId),1);}
+
 	var shuffle = function(cards){
 		var cardstack = Object.create(cards);
 		var currentIndex = cardstack.length
@@ -95,5 +104,7 @@ module.exports = function(cards){
 		,getOpponentIdFrom: getOpponentIdFrom
 		,giveCards: giveCards
 		,getFirstTurn: getFirstTurn
+		,getPlayersMatch: getPlayersMatch
+		,deleteMatch: deleteMatch
 	}
 }

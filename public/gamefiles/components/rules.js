@@ -30,12 +30,14 @@ Crafty.c('Rules',{
 			switch(occ.diff){
 			//--- different card values: 1	----------------------------------------------------
 					//staight
+					
 				case 5:
+					var staightWithAceOffset = 8; // if straight is ace,2,3,... (is diff between 13 and 5) -> [2,3,4,5,14]
 					var failsafe = false;
 					var limit = occ.high.value-5;
 					var takenJocker = 0;
 					for (var i = occ.high.value; i > limit; i--) {	//straight
-						if(typeof(occ.values[i]) == "undefined")
+						if(typeof(occ.values[i]) == "undefined" || typeof(occ.values[(i-staightWithAceOffset)] == "undefined"))
 						{
 							if(occ.jocker && takenJocker < occ.jocker)
 								{takenJocker++;}
@@ -170,7 +172,6 @@ Crafty.c('Rules',{
 	}
 	,countOccurrences: function(row){
 		//count occurrences
-		 	var highest = {2:3,a:2};
 		var occ = {};
 		var suits = {};
 		occ['high'] = {count: 0,value: null};

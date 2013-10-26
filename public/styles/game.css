@@ -2,7 +2,7 @@
 	margin: 0 auto;
 }
 
-.hpDisplay{
+.hpDisplay,.nameDisplay{
 	-webkit-text-stroke-width: 1px;
 	-webkit-text-stroke-color: black;
 	-moz-text-stroke-width: 1px;
@@ -47,10 +47,10 @@
 	text-align: center;
 	border-top-right-radius: 15px;
 	border-top-left-radius: 15px;
-	padding-bottom: 7px;
+	padding-top: 15px;
 	border: 1px solid black;
 	border-bottom: none;
 }
 
 	.turnBadgeTopTurn{top:0px;}
-	.turnBadgeBottomTurn{top:483px;};
+	.turnBadgeBottomTurn{top:438px;};
