@@ -1,9 +1,4 @@
 Game = {
-	starttest: function(tabledata,playerdata,opponentdata){
-		console.log(tabledata);		//fieldcards
-		console.log(playerdata);
-		console.log(opponentdata);
-	},
 	start: function startGame(tabledata,playerdata,opponentdata,socket)
 	{
 		var tabledata = tabledata,

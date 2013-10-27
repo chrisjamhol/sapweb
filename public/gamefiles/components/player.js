@@ -43,6 +43,7 @@ Crafty.c('player',{
 								.bind("StartDrag",function onStartDrag(){							//event start drag
 									this.oldpos.x = this.x;
 									this.oldpos.y = this.y;
+									that.table.enableFieldcardslots();
 								})
 								.bind("StopDrag", function onStopDrag (data) {						//event stop drag
 									var card = this;

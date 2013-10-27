@@ -5,6 +5,7 @@ Crafty.c('table',{
 	cards: null,
 	fieldcards: null,
 	fieldCardslots: null,
+	lastPlayedCard: null,
 	hitDescription: null,
 	hitDescriptionPos: {x: 560, y: 270},
 	player: null,
@@ -141,6 +142,14 @@ Crafty.c('table',{
 									weight: 'bold'
 								})
 								.textColor('#d83f46', 1);
+
+		this.lastPlayedCard = {
+			card: null, 
+			row: null, 
+			col: null, 
+			resetAll: function(){this.card = null;this.row = null;this.col = null;},
+			set: function(card, row, col){this.card = card;this.row = row;this.col = col;}
+		};
 	}
 	,initSockets: function(){
 		var that = this;
@@ -177,13 +186,16 @@ Crafty.c('table',{
 			that.player.removeCardsFromStack(newCards);
 		});
 
-		this.socket.on("getDroppedCard",function onGetDroppedCard(droppData){
-			Crafty(droppData.card.value).destroy();
-			that.fieldCardslots.rows[droppData.cardslot.row][droppData.cardslot.col].card = Crafty.e("2D,DOM,Card,"+droppData.card.value).
+		this.socket.on("getDroppedCard",function onGetDroppedCard(dropData){
+			Crafty(dropData.card.value).destroy();
+			if(that.lastPlayedCard.card != dropData.card.value && that.lastPlayedCard.card != null){
+				that.fieldCardslots.rows[that.lastPlayedCard.row][that.lastPlayedCard.col].card = null;
+			}
+			that.fieldCardslots.rows[dropData.cardslot.row][dropData.cardslot.col].card = Crafty.e("2D,DOM,Card,"+dropData.card.value).
 																								attr({
-																									x: that.fieldCardslots.rows[droppData.cardslot.row][droppData.cardslot.col].x+5,
-																									y: that.fieldCardslots.rows[droppData.cardslot.row][droppData.cardslot.col].y+5,
-																									value: droppData.card.value
+																									x: that.fieldCardslots.rows[dropData.cardslot.row][dropData.cardslot.col].x+5,
+																									y: that.fieldCardslots.rows[dropData.cardslot.row][dropData.cardslot.col].y+5,
+																									value: dropData.card.value
 																								});
 		});
 		this.socket.on("takeDamage",function onTakeDamage(hits){
@@ -363,7 +375,7 @@ Crafty.c('table',{
 	,cardDropped: function(card,cardslot){
 		var that = this;
 			//comes from the event from card element!!! Assures that card is dropped correct
-		cardslot.setTaken();														//block slot til next round
+		cardslot.setTaken();														//block slot 'til next round
 		this.fieldCardslots.rows[cardslot.row][cardslot.col].card = card;			//set refrents to the dropped card in slot
 		this.socketSend("cardDropped",{
 										"card": {"value": card.value},
@@ -373,13 +385,20 @@ Crafty.c('table',{
 											"col": cardslot.col
 										}
 									});
-
-		if(this.turn.move < 1)
+		if(this.turn.move <= 1)
 		{
-			this.limitDropzones(cardslot,this.fieldCardslots);						//set allowed dropps for second card
-			this.turn.move++;
+			if(this.lastPlayedCard.card != null){
+				console.log(this.lastPlayedCard.card+" "+this.lastPlayedCard.row+" "+this.lastPlayedCard.col);
+				this.fieldCardslots.rows[this.lastPlayedCard.row][this.lastPlayedCard.col].card = null;				
+			}
+			if(card.value != this.lastPlayedCard.card){					
+				this.turn.move++;
+			}
+			this.lastPlayedCard.set(card.value, cardslot.row, cardslot.col);
+			console.log(this.lastPlayedCard);
+			this.limitDropzones(cardslot,this.fieldCardslots);						//set allowed dropps for second card			
 		}
-		else
+		if(this.turn.move > 1)
 		{
 			var that = this;
 			this.moves++;
@@ -403,6 +422,7 @@ Crafty.c('table',{
 			});
 
 		}
+		console.log(this.fieldCardslots.getSlots());
 	}
 	,limitDropzones: function(sourceCardslot,fieldcardslots){
 		var row = sourceCardslot.row, col = sourceCardslot.col;
@@ -429,11 +449,11 @@ Crafty.c('table',{
 			if(row == 0 && col == 0)	//top left
 			{fieldcardslots.rows[4][4].obj.enable(); fieldcardslots.setCardOpacity({mode: "diagonal",direction: "toRight",opacity: "1"});}
 			if(row == 4 && col == 0)	//bottom left
-			{fieldcardslots.rows[0][4].obj.enable(); fieldcardslots.setCardOpacity({mode: "diagonal",direction: "toRight",opacity: "1"});}
+			{fieldcardslots.rows[0][4].obj.enable(); fieldcardslots.setCardOpacity({mode: "diagonal",direction: "toLeft",opacity: "1"});}
 			if(row == 0 && col == 4)	//top right
 			{fieldcardslots.rows[4][0].obj.enable(); fieldcardslots.setCardOpacity({mode: "diagonal",direction: "toLeft",opacity: "1"});}
 			if(row == 4 && col == 4)	//bottom right
-			{fieldcardslots.rows[0][0].obj.enable(); fieldcardslots.setCardOpacity({mode: "diagonal",direction: "toLeft",opacity: "1"});}
+			{fieldcardslots.rows[0][0].obj.enable(); fieldcardslots.setCardOpacity({mode: "diagonal",direction: "toRight",opacity: "1"});}
 		}
 	}
 	,checkForHits: function(sourceCardslot,fieldcardslots,callback){			//get affected rows and check them agains the rules
@@ -572,6 +592,7 @@ Crafty.c('table',{
 	}
 	,roundOver: function(newFieldCards){
 		this.round++;
+		this.lastPlayedCard.resetAll();
 		this.fieldcards = newFieldCards;
 		this.newRound();
 		this.moves = 0;
