@@ -144,9 +144,9 @@ Crafty.c('table',{
 								.textColor('#d83f46', 1);
 
 		this.lastPlayedCard = {
-			card: null, 
-			row: null, 
-			col: null, 
+			card: null,
+			row: null,
+			col: null,
 			resetAll: function(){this.card = null;this.row = null;this.col = null;},
 			set: function(card, row, col){this.card = card;this.row = row;this.col = col;}
 		};
@@ -246,7 +246,9 @@ Crafty.c('table',{
 		$.each(this.playerCardslotsPos,function settingUpCardslots(playerkey,position){
 			var playerCardslots = {};
 			for(var i=0;i<=position.length-1;i++){
-				playerCardslots[i] = Crafty.e("2D,DOM,Cardslot").attr({x:position[i][0], y:position[i][1], hasCard: false});
+				playerCardslots[i] = Crafty.e("2D, DOM, Cardslot, playercardslot")
+										.playercardslot(i)
+										.attr({x:position[i][0], y:position[i][1]});
 			}
 			that.playerCardslots[playerkey] = [];
 			that.playerCardslots[playerkey].push(playerCardslots);
@@ -284,7 +286,7 @@ Crafty.c('table',{
 		that.player.shield(playerdata.shield);
 		that.player.updateHealthDisplay();
 
-		//create the opponent obj		
+		//create the opponent obj
 		that.opponent
 			.opponent(
 				opponentdata.id,
@@ -310,7 +312,7 @@ Crafty.c('table',{
 		}else{
 			console.log("not first turn");
 			$('.turnBadgeBottom').addClass('turnBadgeBottomTurn');
-			//this.opponent.isTurn();	
+			//this.opponent.isTurn();
 		}
 
 	}
@@ -389,14 +391,14 @@ Crafty.c('table',{
 		{
 			if(this.lastPlayedCard.card != null){
 				console.log(this.lastPlayedCard.card+" "+this.lastPlayedCard.row+" "+this.lastPlayedCard.col);
-				this.fieldCardslots.rows[this.lastPlayedCard.row][this.lastPlayedCard.col].card = null;				
+				this.fieldCardslots.rows[this.lastPlayedCard.row][this.lastPlayedCard.col].card = null;
 			}
-			if(card.value != this.lastPlayedCard.card){					
+			if(card.value != this.lastPlayedCard.card){
 				this.turn.move++;
 			}
 			this.lastPlayedCard.set(card.value, cardslot.row, cardslot.col);
 			console.log(this.lastPlayedCard);
-			this.limitDropzones(cardslot,this.fieldCardslots);						//set allowed dropps for second card			
+			this.limitDropzones(cardslot,this.fieldCardslots);						//set allowed dropps for second card
 		}
 		if(this.turn.move > 1)
 		{

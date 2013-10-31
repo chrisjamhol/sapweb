@@ -10,7 +10,7 @@ Game = {
 		var spritepath = "/public/gamefiles/sprites/";
 		//var spritepath = "http://192.168.1.222/webroot_chris/test/"
 		var gamefilespath = "/public/gamefiles/";
-		loadComponents(['card','player','opponent','table','rules','fieldcardslot','life','weaponComp','shield'
+		loadComponents(['card','player','opponent','table','rules','fieldcardslot','life','weaponComp','shield','playercardslot'
 							,'weapons/w_stick'
 							,'weapons/w_mightyhammer'],function afterLoadComp(){
 			var cards = [];

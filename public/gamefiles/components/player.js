@@ -24,11 +24,12 @@ Crafty.c('player',{
 		return this;
 	}
 	,drawCards: function(){
+		console.log(this.cardslots);
 		var limit = Object.keys(this.cardslots).length;
 		var newCardsData = [];
 		for(var i=0;i<=limit-1;i++)
 		{
-			if(this.cardslots[i].hasCard == false)				//each slot without card gets a card
+			if(this.cardslots[i].checkHasCard() == false)				//each slot without card gets a card
 			{
 				var that = this;
 				var randnumber = Math.floor((Math.random()*this.stackcards.length));		//random card from stack
@@ -44,18 +45,19 @@ Crafty.c('player',{
 									this.oldpos.x = this.x;
 									this.oldpos.y = this.y;
 									that.table.enableFieldcardslots();
+									that.cardslots[this.sourceCardslot].hasNoCard();
 								})
 								.bind("StopDrag", function onStopDrag (data) {						//event stop drag
 									var card = this;
 									this.dropped(function onDropped(chosencardslot){
 										if(chosencardslot != "undefined")	//correct drop
 										{
-											that.cardslots[card.sourceCardslot].hasCard = false;
+											that.cardslots[card.sourceCardslot].hasNoCard();
 										}
 									});
 								});
 				this.acitvecards.push(newCard);
-				this.cardslots[i]['hasCard'] = true;
+				this.cardslots[i].hasCard();
 				this.stackcards.splice(randnumber,1);
 				newCardsData.push({"slot": i, "card": {"value": newCard.value}});
 			}
@@ -71,7 +73,7 @@ Crafty.c('player',{
 		this.stackcards = {};
 		this.acitvecards = [];
 		$.each(this.cardslots,function resetCardslot(key,cardslot){
-			cardslot.hasCard = false;
+			cardslot.hasNoCard();
 		});
 		return this;
 	}

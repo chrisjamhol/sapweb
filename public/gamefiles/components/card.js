@@ -42,6 +42,17 @@ Crafty.c('Card',{
 				}
 			}
 		});
+
+		this.onHit('playercardslot',function(data){
+			var slot = data[0].obj;
+			console.log("hit slot");
+			if(!slot.checkHasCard()){
+				this.unbind('EnterFrame');
+				console.log("onHit playercardslot && hasnoCard");
+			}
+
+		});
+
 		var that = this;
 		var interval = setInterval(function(){
 			if(!that.droppedCorrect)	//bounce back if not droped correct
