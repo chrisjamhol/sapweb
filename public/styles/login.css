@@ -1,0 +1,94 @@
+.logon_form{
+	position:absolute;
+	top: 50%;
+	left: 50%;
+	margin: -185px 0 0 -150px;
+	width: 300px;
+	height: 370px;
+	background-color: white;
+	border-radius: 3px;
+	text-align: center;
+}
+
+#logon{
+	height: 100%;
+	background-color: #ECECEC;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.logon_form_body{
+	height: 100%;
+	width: 100%;
+}
+
+	.logon_form_header{
+		background-color: #00B2B2;
+		height: 50px;
+		text-align: center;
+		vertical-align: middle;
+		line-height: 50px;
+		border-radius: inherit;
+	}
+
+	.logon_input{
+		line-height: 1.7em;
+		width: calc(100% - 5em);
+
+	}
+
+.logon_form_avatar{
+	border-radius: 50%;
+	border: 1px solid gray;
+	opacity: 0.3;
+	margin-top: 50px;
+	margin-bottom: 50px;
+}
+
+.logon_form_avatar_chosen{
+	opacity: 1;
+}
+
+.logon_form_form{
+	height: 100%;
+}
+
+.playButton{
+	margin-bottom: 50px;
+	margin-top: 50px;
+	font-family: inherit;
+    font-size: 120%;
+    *font-size: 120%; /*IE 6/7 - To reduce IE's oversized button text*/
+    *overflow: visible; /*IE 6/7 - Because of IE's overly large left/right padding on buttons */
+    padding: 0.5em 1.5em 0.5em;
+    border: 1px solid #999;  /*IE 6/7/8*/
+    border: none rgba(0, 0, 0, 0);  /*IE9 + everything else*/
+    text-decoration: none;
+    border-radius: 2px;
+    /* Transitions */
+    -webkit-transition: 0.1s linear -webkit-box-shadow;
+    -moz-transition: 0.1s linear -moz-box-shadow;
+    -ms-transition: 0.1s linear box-shadow;
+    -o-transition: 0.1s linear box-shadow;
+    transition: 0.1s linear box-shadow;
+	color: white;
+	border-radius: 4px;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+	background: rgb(28, 184, 65);
+}
+
+	.playButton:hover,.playButton:focus{
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#1a000000',GradientType=0);
+	    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(transparent), color-stop(40%, rgba(0,0,0, 0.05)), to(rgba(0,0,0, 0.10)));
+	    background-image: -webkit-linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
+	    background-image: -moz-linear-gradient(top, rgba(0,0,0, 0.05) 0%, rgba(0,0,0, 0.10));
+	    background-image: -o-linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
+	    background-image: linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
+	}
+
+	.playButton:focus {
+	    outline: 0;
+	}
+
+	.playButton:active{
+		box-shadow: 0 0 0 1px rgba(0,0,0, 0.15) inset, 0 0 6px rgba(0,0,0, 0.20) inset;
+	}

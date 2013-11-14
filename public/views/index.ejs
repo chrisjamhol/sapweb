@@ -4,6 +4,7 @@
 	<meta http-equiv="Cache-control" content="public">
 	<link rel="stylesheet" href="/public/styles/base.css">
 	<link rel="stylesheet" href="/public/styles/game.css">
+	<link rel="stylesheet" href="/public/styles/login.css">
 	<script src="/public/libary/jquery/jquery-2.0.3.js"></script>
 	<script src="/public/libary/craftyjs/release/0.5.4/crafty_min.js"></script>
 	<script src="/public/scripts/game.js"></script>
@@ -16,26 +17,18 @@
 <body>
 	<section id="wrapper">
 		<section id="logon">
-			<section id="logon_content">
-				<div id="logon_content_wrapper">
-					<h1>Sword and Poker Clone</h1>
-					<label class="logon_label">Name</label>
-					<input type="text" class="logon_input" name="login_name" id="login_name" /><br />
-					<label class="logon_label">Avatar</label>
-					<select id="login_avatar" class="logon_input" name="login_avatar">
-						<option value="0">Rocky</option>
-						<option value="1">Slime</option>
-					</select><br />
-					<button id="playerloginButton" type="submit">Play!</button>
-					<span class="waitingDisplay">
-						<div id="circleG_1" class="circleG"></div>
-						<div id="circleG_2" class="circleG"></div>
-						<div id="circleG_3" class="circleG"></div><br />
-						<p class="waitingText">Waiting for opponent</p>
-					</span>
+			<section class="logon_form">
+				<div class="logon_form_body">
+					<form id="logon_form_form" action="">
+						<div>
+							<img class="logon_form_avatar av1 logon_form_avatar_chosen" src="/public/images/player_rocky.png" data-avatar="Rocky" />
+							<img class="logon_form_avatar av2" src="/public/images/player_slime.png"  data-avatar="Slime" />
+						</div>
+						<input type="text" class="logon_input" name="login_name" id="login_name" placeholder="Name"/><br />
+						<input class="playButton" type="submit" value="Play!" />
+					</form>
 				</div>
 			</section>
-			<aside id="logon_image"></aside>
 		</section>
 		<section id="crafty_stage">
 			<div class="turnBadge turnBadgeTop">

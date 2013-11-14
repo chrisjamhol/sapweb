@@ -10,13 +10,21 @@ $('document').ready(function onDocumentReady(){
 	socket.on("getOpponentData",onGetOpponentData);
 	socket.on("getTableData",onGetTableData);
 
-	$('#playerloginButton').click(function clickedLogin(){
+	$('#logon_form_form').submit(function clickedLogin(event){
+		event.preventDefault();
 		var playername = $('#login_name').val();
-		var playeravatar = $('#login_avatar').val();
+		var playeravatar = $('.logon_form_avatar_chosen').data("avatar");
 		if(playername != ""){
 			logoninfo = {"name": playername, "avatar": playeravatar};
 			socket.emit('login',logoninfo);
+			$('.playButton').val('Waiting for Opponent');
 		}
+	});
+
+	$('.logon_form_avatar').click(function avatarClicked(){
+		console.log("clicked avartar");
+		$('.logon_form_avatar_chosen').removeClass("logon_form_avatar_chosen");
+		$(this).addClass("logon_form_avatar_chosen");
 	});
 
 	function onDisconnect(){
