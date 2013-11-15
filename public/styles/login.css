@@ -16,8 +16,26 @@
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
+.logon_header{
+	height: 70px;
+	background-color: #27ae60;
+	border-radius: inherit;
+	text-align: center;
+	vertical-align: middle;
+}
+
+	.logon_header_logo{
+		float: left;
+		margin: 18px 0 0 18px;
+	}
+
+	.logon_header h1{
+		margin: 0px;
+		line-height: 70px;
+	}
+
 .logon_form_body{
-	height: 100%;
+	height: 300px;
 	width: 100%;
 }
 
@@ -28,20 +46,19 @@
 		vertical-align: middle;
 		line-height: 50px;
 		border-radius: inherit;
+		font-size: 110%;
 	}
 
 	.logon_input{
 		line-height: 1.7em;
 		width: calc(100% - 5em);
-
 	}
 
 .logon_form_avatar{
 	border-radius: 50%;
 	border: 1px solid gray;
 	opacity: 0.3;
-	margin-top: 50px;
-	margin-bottom: 50px;
+	margin: 38px 0 33px 0;
 }
 
 .logon_form_avatar_chosen{
@@ -53,8 +70,7 @@
 }
 
 .playButton{
-	margin-bottom: 50px;
-	margin-top: 50px;
+	margin: 29px 0 34px 0;
 	font-family: inherit;
     font-size: 120%;
     *font-size: 120%; /*IE 6/7 - To reduce IE's oversized button text*/
