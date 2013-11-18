@@ -1,0 +1,41 @@
+Table
+--
+- tabledata : Object
+- socket : Object
+- allCards : Object[]
+- cards : Object[]
+- fieldcards : Object []
+- fieldCardslots : Object[]
+- lastPlayedCard : Object
+- player : Player
+- opponent : Opponent
+- rules : Object
+- turn : Object
+- rounds : int
+- moves : int
+- playerCardslots : Object[]
+--
++ Table (cards : Object, data : Object, socket : Object) : Object
++ init () : void
+- initSockets () : void
+- socketSend (statement : String, data : Object) : void
+- newGame (playerdata : Object, opponentdata : Object) : void
+- initPlayer (playerdata : Object, opponentdata : Object, callback : Function) : void
+- newRound () : void
+- clearCards () : void
+- giveCards (fieldcards : Object) : void
+- cardDropped (card : Object, cardslot : Object) : void
+- limitDropzones (sourceCardslot : Object, fieldcardslots : Object) : void
+- checkForHits (sourceCardslot : Object, fieldcardslots : Object, callback : Function) : void
+- showHits (hits : Object, callback : Function) : void
+- takeDamage (hits : Object, fullDamage : int, callback : Function) : void
+- displayDamage (hitDescription : Object, callback : Function) :
+- handleTurnEnd () : void
+- changeTurn () : void
+- initNewTurn () : void
+- enableFieldcardslots () : void
+- roundOver () : void
+- getAdjacentColCardCount (fieldcardslots : Object) : Object
+- getAdjacentRowCardCount (fieldcardslots : Object) : Object
+- getColCards (fieldcardslots : Object, col : int) : Object
+- getDiagonalCards (fieldcardslots : Object, direction : String) : Object

@@ -1,0 +1,18 @@
+Gamemaster
+--
+- cards : Object
+- Player : Player
+- players : Object
+- matches: Object[]
+--
++ addPlayer (id : int, playerdata : Object) : int
++ giveCards () : Object
++ removePlayer (playerId : Object) : void
++ getPlayers () : Object
++ getPlayerById (id : int) : Object
++ getOpponentIdFrom (id : int) : int
+- findMatch (id : int) : void
++ getPlayersMatch (playerId : int) : String
++ deleteMatch (matchId : int) : void
+- shuffle (cards : Object) : Object
+- createFirstTurn () : int

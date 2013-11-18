@@ -1,0 +1,15 @@
+Player
+--
+- id : int
+- isTurn: boolean
+- name : String
+- avatar : int
+- health : int
+- weapon : String
+- playernumber : int
+--
++ setPlayerNumber (playernumber : int) : void
++ getPlayer () : Object
++ checkIfTurn () : boolean
++ isTurn () : void
++ turnOver () : void

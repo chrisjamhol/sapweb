@@ -1,0 +1,34 @@
+App
+--
+- filesystemModule : Object
+- pathModule : Object
+- config : Object
+- express : Object
+- app : Object
+- routes : Object
+- httpModule : Object
+- server : Object
+- io : Object
+- gamemaster: Gamemaster
+--
+- getOtherPlayerId (id : int) : int
+- configExpress (app : Object) : void
+- init () : void
+- setEventHandlers () : void
++ onSocketConnection (client : Object) : void
++ onClientDisconnect (playerId : int) : void
++ onLoginUser (playerdata : Object) : void
++ onGetPlayerData () : void
++ onGetOpponentData () : void
++ onSendPlayerCards (playerCards : Object) : void
++ onRecievedOpponentCards (opponentCards : Object) : void
++ onNewHandCards (handcards : Object) : void
++ onGetCards () : void
++ onCardDropped (droppedData : Object) : void
++ onInflictDamage (hits : Object) : void
++ onTookDamage (damage : Object) : void
++ onHitsTaken () : void
++ onTurnOver () : void
++ onNewRound () : void
++ onPlayerFinishedRound () : void
++ onLose () : void

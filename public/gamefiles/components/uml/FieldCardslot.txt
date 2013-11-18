@@ -1,0 +1,14 @@
+FieldCardslot
+--
+- row : int
+- col : int
+- enabled : boolean
+- taken : boolean
+--
++ FieldCardslot (row : int, col : int) : Object
++ disable () : void
++ enable () : void
++ setTaken () : boolean
++ checkEnabled () : boolean
++ checkTaken () : boolean
++ reset () : void

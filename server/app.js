@@ -34,7 +34,7 @@ function init(){
 
 var setEventHandlers = function() {
     // Socket.IO
-    io.sockets.on("connection", onSocketConnection);    
+    io.sockets.on("connection", onSocketConnection);
 };
 
 function onSocketConnection(client){
@@ -63,14 +63,14 @@ function onClientDisconnect(playerId){
     var opponentIds = gamemaster.getOpponentIdFrom(playerId);
     if(opponentIds != null){
         if(opponentIds[0] && opponentIds[1]){
-            var otherPlayerId = (this.id == opponentIds[0]) ? opponentIds[1] : opponentIds[0];       
+            var otherPlayerId = (this.id == opponentIds[0]) ? opponentIds[1] : opponentIds[0];
             gamemaster.removePlayer(otherPlayerId);
         }
         gamemaster.removePlayer(playerId);
         gamemaster.deleteMatch(gamemaster.getPlayersMatch(playerId));
         io.sockets.socket(otherPlayerId).emit("disconnected");
-    } 
-   
+    }
+
 }
 
 function onLoginUser(playerdata){
@@ -160,7 +160,7 @@ function configExpress(app){
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
     app.use(app.router);
     app.use(express.compress());
-    
+
     app.use(express.static(path.join(__dirname, '../../' , publicPaths.publicSpritesPath), { maxAge: 86400000 }));
     //app.use(express.static(publicPaths.publicViewPath));
     app.set('views', publicPaths.publicViewPath);

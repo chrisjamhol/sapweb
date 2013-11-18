@@ -1,0 +1,27 @@
+Player
+--
+- id : int
+- character : int
+- table : Table
+- cards : Object
+- stackcards : Object
+- acitvecards : Object
+- cardslots : Object[]
+- firstTurn : boolean
+- name : String
+--
++ Player (id : int, table : Table, charpos : Object, healthPos : Object,
+   namePos : Object, characterId : int, playername : String, firstTurn : boolean) : Object
++ drawCards () : Object
++ getHandCards () : Object
++ resetStackcards () : void
++ setCards (cards : Object) : void
++ setPlayerCardslots (playerCardslots : Object) : void
++ isTurn () : void
++ turnOver () : void
++ drawChar (charPos : Object) : void
++ drawHealth (healthPos : Object) : void
++ drawName (namePos) : void
++ updateHealthDisplay () : void
++ removeCardsFromStack (cards : Object) : void
++ startPlaying () : void

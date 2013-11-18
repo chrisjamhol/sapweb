@@ -1,0 +1,18 @@
+Opponent
+--
+- id : int
+- character : int
+- cardslots : Object[]
+- opponentname : String
+--
++ Opponent (id : int,name : String, charpos : Object,
+  healthPos : Object, namePos : Object, characterId : int) : Object
++ setCards (cards : Object) : void
++ setHandCard (cardData : Object) : void
++ resetStackcards () : void
++ isTurn () : void
++ turnOver () : void
++ drawChar (charPos : Object) : void
++ drawHealth (healthPos : Object) : void
++ drawName (namePos) : void
++ updateHealthDisplay () : void

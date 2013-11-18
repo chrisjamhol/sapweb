@@ -1,0 +1,6 @@
+Weapon
+--
+- attk : int
+--
++ Weapon (attk : int) : Object
++ use () : int

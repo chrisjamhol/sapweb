@@ -1,0 +1,9 @@
+Cardslot
+--
+- id : int
+- hasCard : boolean
+--
++ Cardslot (id : int) : Object
++ hasCard () : void
++ hasNoCard () : void
++ checkHasCard () : boolean

@@ -1,0 +1,5 @@
+Game
+--
+--
++ start (tabledata : Object, playerdata : Object,
+	opponentdata : Object, socket : Object) : void

@@ -1,0 +1,9 @@
+Card
+--
+- value : String
+- oldpos : Object
+- droppedCorrect : boolean
+- table : Table
+--
++ Card (table : Table) : Object
++ dropped () : Object
