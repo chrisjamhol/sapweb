@@ -98,8 +98,15 @@ module.exports = function(grunt) {
 
 		watch: {
 			main: {
-				files: [ 'Gruntfile.js', 'js/reveal.js', 'css/reveal.css' ],
+				files: [ 'Gruntfile.js'],
 				tasks: 'default'
+			},
+			html: {
+				files: [ 'js/reveal.js', 'css/reveal.css', 'index.html'],
+				options: {
+					livereload: true
+				},
+				tasks: 'reload'
 			},
 			theme: {
 				files: [ 'css/theme/source/*.scss', 'css/theme/template/*.scss' ],
@@ -121,6 +128,8 @@ module.exports = function(grunt) {
 
 	// Default task
 	grunt.registerTask( 'default', [ 'jshint', 'cssmin', 'uglify', 'qunit' ] );
+
+	grunt.registerTask( 'reload', [ ]);
 
 	// Theme task
 	grunt.registerTask( 'themes', [ 'sass' ] );

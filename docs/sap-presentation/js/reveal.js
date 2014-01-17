@@ -39,7 +39,7 @@ var Reveal = (function(){
 			slideNumber: false,
 
 			// Push each slide change to the browser history
-			history: false,
+			history: true,
 
 			// Enable keyboard shortcuts for navigation
 			keyboard: true,
@@ -75,10 +75,10 @@ var Reveal = (function(){
 			autoSlideStoppable: true,
 
 			// Enable slide navigation via mouse wheel
-			mouseWheel: false,
+			mouseWheel: true,
 
 			// Apply a 3D roll to links on hover
-			rollingLinks: false,
+			rollingLinks: true,
 
 			// Hides the address bar on mobile devices
 			hideAddressBar: true,
